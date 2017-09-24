@@ -1,4 +1,5 @@
-import log from '../';
+import log from '../..';
+
 
 log.l(123,456)
 log.w(123,456)
