@@ -16,11 +16,22 @@ export interface LoggerPublicProperties {
     format(...text: any[]): any[];
     /**
      * 用于打印一行分隔符。
-     * 默认 char='-' , length=30
+     * 注意：line必须直接跟在log后面，例如：log.line()
+     * 默认 char='-' , length=100
      *
      * @memberof LoggerPublicProperties
      */
     line(char?: string, length?: number): void;
+    /**
+     * 如果line前面带有修饰符，则可以将指定格式的内容打印在两条分割线中间，例如：
+     * ————————————
+     * 　　　　　text
+     * ————————————
+     *
+     * @param {...any[]} text
+     * @memberof LoggerPublicProperties
+     */
+    line(...text: any[]): void;
     /**
      * 表示通过console.warn进行输出。同时将默认输出颜色设置为黄色
      *
