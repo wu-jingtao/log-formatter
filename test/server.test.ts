@@ -9,3 +9,9 @@ it('不带连缀', function () {
     log.warn(...args);
     log.error(...args);
 });
+
+it('连缀用法', function () {
+    const format = log.noTime.location.round.mustache.title.bold.magenta.content.yellow;
+    format('test','test Error', new Error('test'));
+});
+

@@ -58,7 +58,7 @@ export class Logger extends Function {
      */
     private _currentLayer(): FormatLayer {
         let layer = this._formatArray[this._formatArray.length - 1];
-        if (layer.tag === 'time')
+        if (layer === undefined || layer.tag === 'time')
             layer = this._newLayer();
 
         return layer;
