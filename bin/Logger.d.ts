@@ -24,14 +24,7 @@ export declare class Logger extends Function {
      * @memberof Logger
      */
     private readonly _formatArray;
-    /**
-     * 输出格式化后的字符串
-     *
-     * @param {...any[]} text 要被格式化的内容
-     * @returns {string}
-     * @memberof Logger
-     */
-    toString(...text: any[]): string;
+    format(...text: any[]): any[];
     /**
      * 将格式化后的文本打印到控制台
      *

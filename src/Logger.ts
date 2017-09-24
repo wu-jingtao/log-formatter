@@ -32,33 +32,42 @@ export class Logger extends Function {
      * @memberof Logger
      */
     private readonly _formatArray: { style?: _chalk.ChalkChain, text?: string, template?: (arg: string) => string }[] = [{
-        get text() {    // 第一个默认是打印时间
+        text: "__time__",
+        template() {    // 第一个默认是打印时间
             return isBrowser ? `[${(new Date).toLocaleTimeString()}]` : chalk.gray(`[${(new Date).toLocaleTimeString()}]`);
         }
-    }];
+    }, {}];
 
-    /**
-     * 输出格式化后的字符串
-     * 
-     * @param {...any[]} text 要被格式化的内容
-     * @returns {string} 
-     * @memberof Logger
-     */
-    toString(...text: any[]): string {
-        let argIndex = 0;   //用到了第几个参数
-        return this._formatArray.reduce((pre, cur) => {
-            let txt = cur.text !== undefined ? cur.text : text[argIndex++];
+    format(...text: any[]): any[] {
+        const result = [];
 
-            if (cur.style !== undefined) {
-                txt = cur.style(txt);
+        for (let i = 0, j = 0; i < text.length; j++) {
+            let txt: string;
+            let style: _chalk.ChalkChain | undefined;
+            let template: ((arg: string) => string) | undefined;
+
+            if (j < this._formatArray.length) {
+                txt = this._formatArray[j].text !== undefined ? this._formatArray[j].text : text[i++];
+                style = this._formatArray[j].style;
+                template = this._formatArray[j].template;
+            } else {
+                txt = text[i++];
+                style = this._formatArray[this._formatArray.length - 1].style;
+                template = this._formatArray[this._formatArray.length - 1].template;
             }
 
-            if (cur.template !== undefined) {
-                txt = cur.template(txt);
+            if (style !== undefined) {
+                txt = style(txt);
             }
 
-            return pre + txt;
-        }, '');
+            if (template !== undefined) {
+                txt = template(txt);
+            }
+
+            result.push(txt);
+        }
+
+        return result;
     }
 
     /**
@@ -70,15 +79,15 @@ export class Logger extends Function {
     log(...text: any[]): void {
         switch (this._type) {
             case LogType.log:
-                console.log(this.toString(...text));
+                console.log(...this.format(...text));
                 break;
 
             case LogType.warning:
-                console.warn(this.toString(...text));
+                console.warn(...this.format(...text));
                 break;
 
             case LogType.error:
-                console.error(this.toString(...text));
+                console.error(...this.format(...text));
                 break;
 
             default:
@@ -99,22 +108,25 @@ export class Logger extends Function {
             },
             get(target, property: keyof LoggerPublicProperties, receiver) {
                 switch (property) {
-                    case 'toString':
-                        return target.toString.bind(target);
+                    case 'format':
+                        return target.format.bind(target);
 
                     case 'line':
                         return (char: string = '-', length: number = 30) => console.log('\r\n', char.repeat(length), '\r\n');
 
                     case 'warn':
                         target._type = LogType.warning;
-                        if (target._formatArray.length === 1)
-                            target._formatArray.push({});
+                        receiver.yellow;
                         return receiver;
 
                     case 'error':
                         target._type = LogType.error;
-                        if (target._formatArray.length === 1)
-                            target._formatArray.push({});
+                        receiver.red;
+                        return receiver;
+
+                    case 'noTime':
+                        if (target._formatArray[0].text === '__time__')
+                            target._formatArray.shift();
                         return receiver;
 
                     case 'text':

@@ -10,9 +10,10 @@ export interface LoggerPublicProperties {
      */
     (...text: any[]): void;
     /**
-     * 不打印到控制台，返回格式化后的字符串
+     * 按照定义好的样式，格式化传入参数。
+     * 如果样式长度大于参数长度，则只应用对应部分，剩下的样式忽略。如果参数长度大于样式长度，则剩下的参数将应用最后一个样式
      */
-    toString(...text: any[]): string;
+    format(...text: any[]): any[];
     /**
      * 用于打印一行分隔符。
      * 默认 char='-' , length=30
@@ -21,19 +22,26 @@ export interface LoggerPublicProperties {
      */
     line(char?: string, length?: number): void;
     /**
-     * 表示通过console.warn进行输出
+     * 表示通过console.warn进行输出。同时将默认输出颜色设置为黄色
      *
      * @type {LoggerPublicProperties}
      * @memberof LoggerPublicProperties
      */
     readonly warn: LoggerPublicProperties;
     /**
-     * 表示通过console.error进行输出
+     * 表示通过console.error进行输出。同时将默认输出颜色设置为红色
      *
      * @type {LoggerPublicProperties}
      * @memberof LoggerPublicProperties
      */
     readonly error: LoggerPublicProperties;
+    /**
+     * 不显示时间输出
+     *
+     * @type {LoggerPublicProperties}
+     * @memberof LoggerPublicProperties
+     */
+    readonly noTime: LoggerPublicProperties;
     /**
      * 定位文本位置
      *
