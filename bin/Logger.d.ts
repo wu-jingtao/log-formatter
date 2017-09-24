@@ -5,7 +5,7 @@ import { LoggerPublicProperties } from './LoggerPublicProperties';
  * @export
  * @class Logger
  */
-export declare class Logger {
+export declare class Logger extends Function {
     /**
      * 日志类型
      *

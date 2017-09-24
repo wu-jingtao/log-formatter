@@ -11,7 +11,7 @@ import { LoggerPublicProperties } from './LoggerPublicProperties';
  * @export
  * @class Logger
  */
-export class Logger {
+export class Logger extends Function {
 
     /**
      * 日志类型
@@ -101,16 +101,20 @@ export class Logger {
                 switch (property) {
                     case 'toString':
                         return target.toString.bind(target);
-                        
+
                     case 'line':
                         return (char: string = '-', length: number = 30) => console.log('\r\n', char.repeat(length), '\r\n');
 
                     case 'warn':
                         target._type = LogType.warning;
+                        if (target._formatArray.length === 1)
+                            target._formatArray.push({});
                         return receiver;
 
                     case 'error':
                         target._type = LogType.error;
+                        if (target._formatArray.length === 1)
+                            target._formatArray.push({});
                         return receiver;
 
                     case 'text':

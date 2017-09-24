@@ -4,7 +4,7 @@ import { LoggerPublicProperties } from './LoggerPublicProperties';
 /**
  * 用于标准化命令行输出的格式
  */
-const log: LoggerPublicProperties = new Proxy({}, {
+const log: LoggerPublicProperties = new Proxy(function () { }, {
     get() {
         return (new Logger).toProxy();
     },
@@ -13,4 +13,4 @@ const log: LoggerPublicProperties = new Proxy({}, {
     }
 }) as any;
 
-export default log
+export default log;

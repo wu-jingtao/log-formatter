@@ -12,6 +12,15 @@
             "args": [
                 "${workspaceRoot}/test/browser/server.ts"
             ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "服务器测试",
+            "program": "${workspaceRoot}/node_modules/ts-node/dist/_bin.js",
+            "args": [
+                "${workspaceRoot}/test/server.test.ts"
+            ]
         }
     ]
 }
