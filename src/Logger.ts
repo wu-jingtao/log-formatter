@@ -116,13 +116,11 @@ export class Logger extends Function {
 
                     case 'warn':
                         target._type = LogType.warning;
-                        receiver.yellow;
-                        return receiver;
+                        return receiver.yellow;
 
                     case 'error':
                         target._type = LogType.error;
-                        receiver.red;
-                        return receiver;
+                        return receiver.red;
 
                     case 'noTime':
                         if (target._formatArray[0].text === '__time__')
