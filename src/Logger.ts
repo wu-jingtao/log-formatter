@@ -178,22 +178,16 @@ export class Logger extends Function {
                         return target.format.bind(target);
 
                     case 'line':
-                        if (target._formatArray.length === 1 && target._formatArray[0].tag === 'time')  //line前面没有附加任何前缀
-                            return (char: string = '-', length: number = 100) => console.log('\r\n', char.repeat(length), '\r\n');
-                        else {  //双线夹文字
-                            return (text: any, char: string = '-', length: number = 100) => {
-                                let result: string = receiver.noTime.format(text)[0];
-                                if (result === undefined)
-                                    result = 'undefined';
-                                result = result.toString();
+                        return (char: string = '-', length: number = 100) => console.log('\r\n', char.repeat(length), '\r\n');
 
-                                let whiteSpace = 0;
-                                if (result.length < length) {    //居中显示
-                                    whiteSpace = (length - result.length / 2) / 2;
-                                }
-
-                                console.log('\r\n', char.repeat(length), '\r\n', ' '.repeat(whiteSpace), result, '\r\n', char.repeat(length), '\r\n');
+                    case 'lineWithText':    //双线夹文字
+                        return (text: any, char: string = '-', length: number = 100) => {
+                            let whiteSpace = 0;
+                            if (text.length < length) {    //居中显示
+                                whiteSpace = (length - text.length) / 2;
                             }
+
+                            console.log('\r\n', char.repeat(length), '\r\n', ' '.repeat(whiteSpace), text, '\r\n', char.repeat(length), '\r\n');
                         }
 
                     case 'warn':
