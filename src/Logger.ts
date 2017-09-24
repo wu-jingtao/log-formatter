@@ -26,17 +26,18 @@ export class Logger extends Function {
      * 
      * style：定义好样式的chalk方法    
      * text：默认的文本。被样式化后传入template进一步处理    
-     * template：模板
+     * template：模板    
+     * tag：内部使用，对这条消息提供一些额外的描述信息
      * 
      * @private
      * @memberof Logger
      */
-    private readonly _formatArray: { style?: _chalk.ChalkChain, text?: string, template?: (arg: string) => string }[] = [{
-        text: "__time__",
-        template() {    // 第一个默认是打印时间
+    private readonly _formatArray: { style?: _chalk.ChalkChain, text?: string, template?: (arg: string) => string, tag?: string }[] = [{
+        tag: "time",
+        get text() {    // 第一个默认是打印时间
             return isBrowser ? `[${(new Date).toLocaleTimeString()}]` : chalk.gray(`[${(new Date).toLocaleTimeString()}]`);
         }
-    }, {}];
+    }, { tag: 'first' }];
 
     format(...text: any[]): any[] {
         const result = [];
@@ -123,34 +124,62 @@ export class Logger extends Function {
                         return receiver.red;
 
                     case 'noTime':
-                        if (target._formatArray[0].text === '__time__')
+                        if (target._formatArray[0].tag === 'time')
                             target._formatArray.shift();
                         return receiver;
 
                     case 'text':
                     case 'title':
-                        target._formatArray.push({});
+                        if (target._formatArray[target._formatArray.length - 1].tag !== 'first')
+                            target._formatArray.push({});
+                        else
+                            target._formatArray[target._formatArray.length - 1].tag = undefined;
                         return receiver;
 
                     case 'content':
-                        target._formatArray.push({ template: (arg) => `\r\n${arg}` });
+                        if (target._formatArray[target._formatArray.length - 1].tag !== 'first')
+                            target._formatArray.push({ template: (arg) => `\r\n${arg}` });
+                        else {
+                            target._formatArray[target._formatArray.length - 1].template = (arg) => `\r\n${arg}`;
+                            target._formatArray[target._formatArray.length - 1].tag = undefined;
+                        }
                         return receiver;
 
                     case 'linefeed':
-                        target._formatArray.push({ text: '\r\n' });
+                        if (target._formatArray[target._formatArray.length - 1].tag !== 'first')
+                            target._formatArray.push({ text: '\r\n' });
+                        else {
+                            target._formatArray[target._formatArray.length - 1].text = '\r\n';
+                            target._formatArray[target._formatArray.length - 1].tag = undefined;
+                        }
                         return receiver;
 
                     case 'square':
                     case 'location':
-                        target._formatArray.push({ template: (arg) => `[${arg}]` });
+                        if (target._formatArray[target._formatArray.length - 1].tag !== 'first')
+                            target._formatArray.push({ template: (arg) => `[${arg}]` });
+                        else {
+                            target._formatArray[target._formatArray.length - 1].template = (arg) => `[${arg}]`;
+                            target._formatArray[target._formatArray.length - 1].tag = undefined;
+                        }
                         return receiver;
 
                     case 'round':
-                        target._formatArray.push({ template: (arg) => `(${arg})` });
+                        if (target._formatArray[target._formatArray.length - 1].tag !== 'first')
+                            target._formatArray.push({ template: (arg) => `(${arg})` });
+                        else {
+                            target._formatArray[target._formatArray.length - 1].template = (arg) => `(${arg})`;
+                            target._formatArray[target._formatArray.length - 1].tag = undefined;
+                        }
                         return receiver;
 
                     case 'mustache':
-                        target._formatArray.push({ template: (arg) => `{${arg}}` });
+                        if (target._formatArray[target._formatArray.length - 1].tag !== 'first')
+                            target._formatArray.push({ template: (arg) => `{${arg}}` });
+                        else {
+                            target._formatArray[target._formatArray.length - 1].template = (arg) => `{${arg}}`;
+                            target._formatArray[target._formatArray.length - 1].tag = undefined;
+                        }
                         return receiver;
 
                     default:    //chalk 样式

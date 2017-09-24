@@ -19,6 +19,7 @@ export declare class Logger extends Function {
      * style：定义好样式的chalk方法
      * text：默认的文本。被样式化后传入template进一步处理
      * template：模板
+     * tag：内部使用，对这条消息提供一些额外的描述信息
      *
      * @private
      * @memberof Logger
