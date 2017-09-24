@@ -3,7 +3,7 @@ const path = require('path');
 
 module.exports = {
     entry: {
-        index: path.resolve(__dirname, './browser.test.ts')
+        index: path.resolve(__dirname, '../index.test.ts')
     },
     output: {
         filename: 'index.js',

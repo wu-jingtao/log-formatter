@@ -19,7 +19,7 @@
             "name": "测试调试",
             "program": "${workspaceRoot}/node_modules/ts-node/dist/_bin.js",
             "args": [
-                "${workspaceRoot}/test/server.test.ts"
+                "${workspaceRoot}/test/index.test.ts"
             ],
             "internalConsoleOptions": "openOnSessionStart"
         }

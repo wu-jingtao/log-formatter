@@ -5,7 +5,7 @@
     "main": "./bin/index.js",
     "types": "./bin/index.d.ts",
     "scripts": {
-        "test": "./node_modules/.bin/ts-node ./test/server.test.ts",
+        "test": "./node_modules/.bin/ts-node ./test/index.test.ts",
         "compile": "./node_modules/.bin/gulp compile"
     },
     "keywords": [
