@@ -27,7 +27,7 @@ export class Logger extends Function {
     constructor() {
         super();
 
-        // 第一层默认是时间
+        // 第一层默认是当前时间
         this._formatArray.push({
             tag: "time",
             get text() {
@@ -58,7 +58,7 @@ export class Logger extends Function {
      */
     private _currentLayer(): FormatLayer {
         let layer = this._formatArray[this._formatArray.length - 1];
-        if (layer === undefined || layer.tag === 'time') {
+        if (layer === undefined || layer.tag === 'time') {  //检查是否创建的第一层
             layer = this._newLayer();
             layer.tag = 'first';    //第一层
         }
