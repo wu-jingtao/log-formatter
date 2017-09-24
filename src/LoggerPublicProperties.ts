@@ -65,20 +65,20 @@ export interface LoggerPublicProperties {
     readonly title: LoggerPublicProperties;
 
     /**
-     * 消息的正文，相当于text='\r\n'+text
-     * 
-     * @type {LoggerPublicProperties}
-     * @memberof LoggerPublicProperties
-     */
-    readonly content: LoggerPublicProperties;
-
-    /**
      * 换行，相当于text='\r\n'
      * 
      * @type {LoggerPublicProperties}
      * @memberof LoggerPublicProperties
      */
     readonly linefeed: LoggerPublicProperties;
+
+    /**
+     * 消息的正文，相当于linefeed.text（'\r\n'+text）
+     * 
+     * @type {LoggerPublicProperties}
+     * @memberof LoggerPublicProperties
+     */
+    readonly content: LoggerPublicProperties;
 
     /**
      * 用方括号包裹要输出的文本内容,相当于text='[${text}]'。    

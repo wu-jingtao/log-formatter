@@ -4,6 +4,7 @@ const chalk: typeof _chalk = isBrowser ? undefined : require.call(undefined, 'ch
 
 import { LogType } from './LogType';
 import { LoggerPublicProperties } from './LoggerPublicProperties';
+import { FormatLayer } from './FormatLayer';
 
 /**
  * 消息模板的构造类
@@ -15,29 +16,80 @@ export class Logger extends Function {
 
     /**
      * 日志类型
-     * 
-     * @private
-     * @memberof Logger
      */
     private _type = LogType.log;
 
     /**
-     * 文本格式化数组    
+     * 样式层数组    
+     */
+    private readonly _formatArray: FormatLayer[] = [];
+
+    constructor() {
+        super();
+
+        // 第一层默认是时间
+        this._formatArray.push({
+            tag: "time",
+            get text() {
+                return isBrowser ? `[${(new Date).toLocaleTimeString()}]` : chalk.gray(`[${(new Date).toLocaleTimeString()}]`);
+            },
+            template: []
+        });
+    }
+
+    /**
+     * 创建新的样式层。
      * 
-     * style：定义好样式的chalk方法    
-     * text：默认的文本。被样式化后传入template进一步处理    
-     * template：模板    
-     * tag：内部使用，对这条消息提供一些额外的描述信息
+     * @private
+     * @returns {FormatLayer} 返回新创建的层
+     * @memberof Logger
+     */
+    private _newLayer(): FormatLayer {
+        const layer = { template: [] };
+        this._formatArray.push(layer);
+        return layer;
+    }
+
+    /**
+     * 返回当前层
      * 
      * @private
      * @memberof Logger
      */
-    private readonly _formatArray: { style?: _chalk.ChalkChain, text?: string, template?: (arg: string) => string, tag?: string }[] = [{
-        tag: "time",
-        get text() {    // 第一个默认是打印时间
-            return isBrowser ? `[${(new Date).toLocaleTimeString()}]` : chalk.gray(`[${(new Date).toLocaleTimeString()}]`);
+    private _currentLayer(): FormatLayer {
+        let layer = this._formatArray[this._formatArray.length - 1];
+        if (layer.tag === 'time')
+            layer = this._newLayer();
+
+        return layer;
+    }
+
+    /**
+     * 为当前层添加新的样式
+     * 
+     * @private
+     * @param {keyof _chalk.ChalkStyleMap} style chalk 样式的名称
+     * @memberof Logger
+     */
+    private _addStyle(style: keyof _chalk.ChalkStyleMap) {
+        const layer = this._currentLayer();
+
+        if (!isBrowser) {   //浏览器没有样式
+            layer.style = layer.style === undefined ? chalk[style] : layer.style[style];
         }
-    }, { tag: 'first' }];
+    }
+
+    /**
+     * 为当前层添加新的样式模板
+     * 
+     * @private
+     * @param {(arg: string) => string} template 样式模板
+     * @memberof Logger
+     */
+    private _addTemplate(template: (arg: string) => string) {
+        const layer = this._currentLayer();
+        layer.template.push(template);
+    }
 
     format(...text: any[]): any[] {
         const result = [];
@@ -45,16 +97,27 @@ export class Logger extends Function {
         for (let i = 0, j = 0; i < text.length; j++) {
             let txt: string;
             let style: _chalk.ChalkChain | undefined;
-            let template: ((arg: string) => string) | undefined;
+            let template: ((arg: string) => string)[];
 
             if (j < this._formatArray.length) {
                 txt = this._formatArray[j].text !== undefined ? this._formatArray[j].text : text[i++];
                 style = this._formatArray[j].style;
                 template = this._formatArray[j].template;
-            } else {
+            } else {   //剩下的参数全部使用最后一种样式进行格式化
                 txt = text[i++];
                 style = this._formatArray[this._formatArray.length - 1].style;
                 template = this._formatArray[this._formatArray.length - 1].template;
+            }
+
+            switch (Object.prototype.toString.call(txt)) {  //对特定类型的对象进行特定转换
+                case '[object Error]':
+                    txt = (<any>txt).stack;
+                    break;
+
+                default:
+                    if (typeof txt === 'object')
+                        txt = JSON.stringify(txt);
+                    break;
             }
 
             if (style !== undefined) {
@@ -62,7 +125,7 @@ export class Logger extends Function {
             }
 
             if (template !== undefined) {
-                txt = template(txt);
+                txt = template.reduce((pre, tmp) => tmp(pre), txt);
             }
 
             result.push(txt);
@@ -72,7 +135,7 @@ export class Logger extends Function {
     }
 
     /**
-     * 将格式化后的文本打印到控制台
+     * 将格式化后的内容打印到控制台
      * 
      * @param {...any[]} text 要被格式化的内容
      * @memberof Logger
@@ -130,63 +193,31 @@ export class Logger extends Function {
 
                     case 'text':
                     case 'title':
-                        if (target._formatArray[target._formatArray.length - 1].tag !== 'first')
-                            target._formatArray.push({});
-                        else
-                            target._formatArray[target._formatArray.length - 1].tag = undefined;
-                        return receiver;
-
-                    case 'content':
-                        if (target._formatArray[target._formatArray.length - 1].tag !== 'first')
-                            target._formatArray.push({ template: (arg) => `\r\n${arg}` });
-                        else {
-                            target._formatArray[target._formatArray.length - 1].template = (arg) => `\r\n${arg}`;
-                            target._formatArray[target._formatArray.length - 1].tag = undefined;
-                        }
+                        target._newLayer();
                         return receiver;
 
                     case 'linefeed':
-                        if (target._formatArray[target._formatArray.length - 1].tag !== 'first')
-                            target._formatArray.push({ text: '\r\n' });
-                        else {
-                            target._formatArray[target._formatArray.length - 1].text = '\r\n';
-                            target._formatArray[target._formatArray.length - 1].tag = undefined;
-                        }
+                        target._newLayer().text = '\r\n';
                         return receiver;
+
+                    case 'content':
+                        return receiver.linefeed.text;
 
                     case 'square':
                     case 'location':
-                        if (target._formatArray[target._formatArray.length - 1].tag !== 'first')
-                            target._formatArray.push({ template: (arg) => `[${arg}]` });
-                        else {
-                            target._formatArray[target._formatArray.length - 1].template = (arg) => `[${arg}]`;
-                            target._formatArray[target._formatArray.length - 1].tag = undefined;
-                        }
+                        target._addTemplate((arg) => `[${arg}]`);
                         return receiver;
 
                     case 'round':
-                        if (target._formatArray[target._formatArray.length - 1].tag !== 'first')
-                            target._formatArray.push({ template: (arg) => `(${arg})` });
-                        else {
-                            target._formatArray[target._formatArray.length - 1].template = (arg) => `(${arg})`;
-                            target._formatArray[target._formatArray.length - 1].tag = undefined;
-                        }
+                        target._addTemplate((arg) => `(${arg})`);
                         return receiver;
 
                     case 'mustache':
-                        if (target._formatArray[target._formatArray.length - 1].tag !== 'first')
-                            target._formatArray.push({ template: (arg) => `{${arg}}` });
-                        else {
-                            target._formatArray[target._formatArray.length - 1].template = (arg) => `{${arg}}`;
-                            target._formatArray[target._formatArray.length - 1].tag = undefined;
-                        }
+                        target._addTemplate((arg) => `{${arg}}`);
                         return receiver;
 
                     default:    //chalk 样式
-                        if (!isBrowser) {   //浏览器没有样式
-                            const piece = target._formatArray[target._formatArray.length - 1];
-                            piece.style = piece.style === undefined ? chalk[property] : piece.style[property];
-                        }
+                        target._addStyle(property);
                         return receiver;
                 }
             }
