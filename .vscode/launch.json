@@ -16,11 +16,19 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "服务器测试",
-            "program": "${workspaceRoot}/node_modules/ts-node/dist/_bin.js",
+            "name": "测试调试",
+            "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
             "args": [
+                "-u",
+                "tdd",
+                "--timeout",
+                "999999",
+                "--colors",
+                "--compilers",
+                "ts:ts-node/register,tsx:ts-node/register",
                 "${workspaceRoot}/test/server.test.ts"
-            ]
+            ],
+            "internalConsoleOptions": "openOnSessionStart"
         }
     ]
 }
