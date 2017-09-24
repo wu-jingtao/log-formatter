@@ -1,7 +1,7 @@
 {
-  "name": "standard-logger",
-  "version": "0.0.1",
-  "description": "Standardize node and browser log output format",
+  "name": "log-formatter",
+  "version": "0.1.0",
+  "description": "结合chalk，提供了一种方便格式化log输出的方式",
   "main": "./bin/index.js",
   "types": "./bin/index.d.ts",
   "scripts": {
@@ -9,15 +9,17 @@
     "compile": "./node_modules/.bin/gulp compile"
   },
   "keywords": [
-    "standard",
+    "log",
+    "formatter",
+    "format",
     "logger"
   ],
   "author": "wujingtao",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mx601595686/standard-logger/issues"
+    "url": "https://github.com/mx601595686/log-formatter/issues"
   },
-  "homepage": "https://github.com/mx601595686/standard-logger#readme",
+  "homepage": "https://github.com/mx601595686/log-formatter#readme",
   "devDependencies": {
     "@types/fs-extra": "^4.0.2",
     "@types/node": "^7.0.13",
