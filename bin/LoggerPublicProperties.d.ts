@@ -76,7 +76,7 @@ export interface LoggerPublicProperties {
      */
     readonly linefeed: LoggerPublicProperties;
     /**
-     * 消息的正文，相当于linefeed.text（'\r\n'+text）
+     * 消息的正文，相当于linefeed.text 相当于'\r\n'+text
      *
      * @type {LoggerPublicProperties}
      * @memberof LoggerPublicProperties
@@ -91,7 +91,7 @@ export interface LoggerPublicProperties {
      */
     readonly square: LoggerPublicProperties;
     /**
-     * 代表消息发生的位置。square的别名
+     * 代表消息发生的位置。相当于text.square
      *
      * @type {LoggerPublicProperties}
      * @memberof LoggerPublicProperties

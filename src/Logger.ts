@@ -216,9 +216,11 @@ export class Logger extends Function {
                         return receiver.linefeed.text;
 
                     case 'square':
-                    case 'location':
                         target._addTemplate((arg) => `[${arg}]`);
                         return receiver;
+
+                    case 'location':
+                        return receiver.text.square;
 
                     case 'round':
                         target._addTemplate((arg) => `(${arg})`);
