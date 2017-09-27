@@ -129,8 +129,8 @@ export class Logger extends Function {
                 break;
 
             case 'noTime':
-                if (this.sequenceIndex === 1) // 这个放在开头计数
-                    this.sequenceIndex--;   
+                if (this.sequenceIndex === 1) // 这个放在开头不计数
+                    this.sequenceIndex = 0;   
                 this._formatArray[0].skip = true;
                 break;
 
