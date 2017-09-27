@@ -11,4 +11,12 @@ log.error(...args);
 log.lineWithText('连缀用法');
 
 const format = log.noTime.location.round.mustache.title.bold.magenta.content.yellow;
-format('test','test Error', new Error('测试打印错误'));
+format('test', 'test Error', new Error('测试打印错误'));
+
+log.line(undefined, 10);
+
+log.warn
+    .location
+    .title.blue
+    .content.red
+    .text.green(`location`, 'title', `content`, 'text');

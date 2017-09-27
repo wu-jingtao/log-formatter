@@ -31,10 +31,18 @@ export interface FormatLayer {
     template: ((arg: string) => string)[];
 
     /**
-     * 内部使用，对这一层提供一些额外的描述信息
+     * 内部使用，对当前层提供一些额外的描述信息
      * 
-     * @type {string}
+     * @type {any}
      * @memberof FormatLayer
      */
-    tag?: string;
+    tag?: any;
+
+    /**
+     * 是否跳过这一层
+     * 
+     * @type {boolean}
+     * @memberof FormatLayer
+     */
+    skip?: boolean;
 }

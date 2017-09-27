@@ -16,6 +16,10 @@ export declare class Logger extends Function {
     private readonly _formatArray;
     constructor();
     /**
+     * 返回当前层
+     */
+    private readonly _currentLayer;
+    /**
      * 创建新的样式层。
      *
      * @private
@@ -23,13 +27,6 @@ export declare class Logger extends Function {
      * @memberof Logger
      */
     private _newLayer();
-    /**
-     * 返回当前层
-     *
-     * @private
-     * @memberof Logger
-     */
-    private _currentLayer();
     /**
      * 为当前层添加新的样式
      *

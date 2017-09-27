@@ -34,7 +34,14 @@ export class Logger extends Function {
                 return isBrowser ? `[${(new Date).toLocaleTimeString()}]` : chalk.gray(`[${(new Date).toLocaleTimeString()}]`);
             },
             template: []
-        });
+        }, { template: [], tag: 'first' });
+    }
+
+    /**
+     * 返回当前层
+     */
+    private get _currentLayer(): FormatLayer {
+        return this._formatArray[this._formatArray.length - 1];
     }
 
     /**
@@ -45,24 +52,13 @@ export class Logger extends Function {
      * @memberof Logger
      */
     private _newLayer(): FormatLayer {
-        const layer = { template: [] };
-        this._formatArray.push(layer);
-        return layer;
-    }
-
-    /**
-     * 返回当前层
-     * 
-     * @private
-     * @memberof Logger
-     */
-    private _currentLayer(): FormatLayer {
-        let layer = this._formatArray[this._formatArray.length - 1];
-        if (layer === undefined || layer.tag === 'time') {  //检查是否创建的第一层
-            layer = this._newLayer();
-            layer.tag = 'first';    //第一层
+        let layer = this._formatArray[1];
+        if (layer.tag === 'first') {
+            layer.tag = undefined;
+        } else {
+            layer = { template: [] };
+            this._formatArray.push(layer);
         }
-
         return layer;
     }
 
@@ -74,8 +70,7 @@ export class Logger extends Function {
      * @memberof Logger
      */
     private _addStyle(style: keyof _chalk.ChalkStyleMap) {
-        const layer = this._currentLayer();
-
+        const layer = this._currentLayer;
         if (!isBrowser) {   //浏览器没有样式
             layer.style = layer.style === undefined ? chalk[style] : layer.style[style];
         }
@@ -89,7 +84,7 @@ export class Logger extends Function {
      * @memberof Logger
      */
     private _addTemplate(template: (arg: string) => string) {
-        const layer = this._currentLayer();
+        const layer = this._currentLayer;
         layer.template.push(template);
     }
 
@@ -102,6 +97,8 @@ export class Logger extends Function {
             let template: ((arg: string) => string)[];
 
             if (j < this._formatArray.length) {
+                if (this._formatArray[j].skip === true) continue;
+
                 txt = this._formatArray[j].text !== undefined ? this._formatArray[j].text : text[i++];
                 style = this._formatArray[j].style;
                 template = this._formatArray[j].template;
@@ -113,7 +110,7 @@ export class Logger extends Function {
 
             switch (Object.prototype.toString.call(txt)) {  //对特定类型的对象进行特定转换
                 case '[object Error]':
-                    txt = (<any>txt).stack;
+                    txt = (<any>txt).message + ' -> ' + (<any>txt).stack;
                     break;
 
                 default:
@@ -199,8 +196,7 @@ export class Logger extends Function {
                         return receiver.red;
 
                     case 'noTime':
-                        if (target._formatArray[0].tag === 'time')
-                            target._formatArray.shift();
+                        target._formatArray[0].skip = true;
                         return receiver;
 
                     case 'text':
