@@ -14,6 +14,10 @@ export declare class Logger extends Function {
      * 样式层数组
      */
     private readonly _formatArray;
+    /**
+     * 当前连缀属性所处的位置
+     */
+    private sequenceIndex;
     constructor();
     /**
      * 返回当前层
@@ -43,6 +47,7 @@ export declare class Logger extends Function {
      * @memberof Logger
      */
     private _addTemplate(template);
+    private _trigger(property);
     format(...text: any[]): any[];
     /**
      * 将格式化后的内容打印到控制台

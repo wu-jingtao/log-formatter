@@ -24,6 +24,11 @@ export class Logger extends Function {
      */
     private readonly _formatArray: FormatLayer[] = [];
 
+    /**
+     * 当前连缀属性所处的位置
+     */
+    private sequenceIndex = 0;
+
     constructor() {
         super();
 
@@ -52,13 +57,8 @@ export class Logger extends Function {
      * @memberof Logger
      */
     private _newLayer(): FormatLayer {
-        let layer = this._formatArray[1];
-        if (layer.tag === 'first') {
-            layer.tag = undefined;
-        } else {
-            layer = { template: [] };
-            this._formatArray.push(layer);
-        }
+        const layer = { template: [] };
+        this._formatArray.push(layer);
         return layer;
     }
 
@@ -86,6 +86,91 @@ export class Logger extends Function {
     private _addTemplate(template: (arg: string) => string) {
         const layer = this._currentLayer;
         layer.template.push(template);
+    }
+
+    private _trigger(property: keyof LoggerPublicProperties): any {
+        switch (property) {
+            case 'format':
+                return this.format.bind(this);
+
+            case 'line':
+                return (char: string = '-', length: number = 100) => console.log('\r\n', char.repeat(length), '\r\n');
+
+            case 'lineWithText':    //双线夹文字
+                return (text: any, char: string = '-', length: number = 100) => {
+                    let whiteSpace = 0;
+                    if (text.length < length) {    //居中显示
+                        whiteSpace = (length - text.length) / 2;
+                    }
+
+                    console.log('\r\n', char.repeat(length), '\r\n', ' '.repeat(whiteSpace), text, '\r\n', char.repeat(length), '\r\n');
+                }
+
+            case 'warn':
+                this._type = LogType.warning;
+                if (this.sequenceIndex === 1) { //如果位于开头，则不添加新层
+                    this.sequenceIndex = 0;
+                    this._trigger('yellow');
+                } else {
+                    this._trigger('text');
+                    this._trigger('yellow');
+                }
+                break;
+
+            case 'error':
+                this._type = LogType.error;
+                if (this.sequenceIndex === 1) {
+                    this.sequenceIndex = 0;
+                    this._trigger('red');
+                } else {
+                    this._trigger('text');
+                    this._trigger('red');
+                }
+                break;
+
+            case 'noTime':
+                if (this.sequenceIndex === 1) // 这个放在开头计数
+                    this.sequenceIndex--;   
+                this._formatArray[0].skip = true;
+                break;
+
+            case 'text':
+            case 'title':
+                if (this.sequenceIndex !== 1) //如果位于开头，则使用first层
+                    this._newLayer();
+                break;
+
+            case 'linefeed':
+                this._trigger('text');
+                this._currentLayer.text = '\r\n';
+                break;
+
+            case 'content':
+                this._trigger('linefeed');
+                this._trigger('text');
+                break;
+
+            case 'square':
+                this._addTemplate((arg) => `[${arg}]`);
+                break;
+
+            case 'location':
+                this._trigger('text');
+                this._trigger('square');
+                break;
+
+            case 'round':
+                this._addTemplate((arg) => `(${arg})`);
+                break;
+
+            case 'mustache':
+                this._addTemplate((arg) => `{${arg}}`);
+                break;
+
+            default:    //chalk 样式
+                this._addStyle(property);
+                break;
+        }
     }
 
     format(...text: any[]): any[] {
@@ -170,66 +255,9 @@ export class Logger extends Function {
                 target.log(...argumentsList);
             },
             get(target, property: keyof LoggerPublicProperties, receiver) {
-                switch (property) {
-                    case 'format':
-                        return target.format.bind(target);
-
-                    case 'line':
-                        return (char: string = '-', length: number = 100) => console.log('\r\n', char.repeat(length), '\r\n');
-
-                    case 'lineWithText':    //双线夹文字
-                        return (text: any, char: string = '-', length: number = 100) => {
-                            let whiteSpace = 0;
-                            if (text.length < length) {    //居中显示
-                                whiteSpace = (length - text.length) / 2;
-                            }
-
-                            console.log('\r\n', char.repeat(length), '\r\n', ' '.repeat(whiteSpace), text, '\r\n', char.repeat(length), '\r\n');
-                        }
-
-                    case 'warn':
-                        target._type = LogType.warning;
-                        return receiver.yellow;
-
-                    case 'error':
-                        target._type = LogType.error;
-                        return receiver.red;
-
-                    case 'noTime':
-                        target._formatArray[0].skip = true;
-                        return receiver;
-
-                    case 'text':
-                    case 'title':
-                        target._newLayer();
-                        return receiver;
-
-                    case 'linefeed':
-                        target._newLayer().text = '\r\n';
-                        return receiver;
-
-                    case 'content':
-                        return receiver.linefeed.text;
-
-                    case 'square':
-                        target._addTemplate((arg) => `[${arg}]`);
-                        return receiver;
-
-                    case 'location':
-                        return receiver.text.square;
-
-                    case 'round':
-                        target._addTemplate((arg) => `(${arg})`);
-                        return receiver;
-
-                    case 'mustache':
-                        target._addTemplate((arg) => `{${arg}}`);
-                        return receiver;
-
-                    default:    //chalk 样式
-                        target._addStyle(property);
-                        return receiver;
-                }
+                target.sequenceIndex++;
+                const result = target._trigger(property);
+                return result === undefined ? receiver : result;
             }
         }) as any;
     }
