@@ -1,6 +1,6 @@
 import * as _chalk from 'chalk';
-import isBrowser from 'is-in-browser';
-const chalk: typeof _chalk = isBrowser ? undefined : require.call(undefined, 'chalk');  //浏览器不进行样式格式化，同时防止webpack打包时引入chalk
+const isNode = require('is-node');
+const chalk: typeof _chalk = isNode ? require.call(undefined, 'chalk') : undefined;  //浏览器不进行样式格式化，同时防止webpack打包时引入chalk
 
 import { LogType } from './LogType';
 import { LoggerPublicProperties } from './LoggerPublicProperties';
@@ -36,7 +36,7 @@ export class Logger extends Function {
         this._formatArray.push({
             tag: "time",
             get text() {
-                return isBrowser ? `[${(new Date).toLocaleTimeString()}]` : chalk.gray(`[${(new Date).toLocaleTimeString()}]`);
+                return isNode ? chalk.gray(`[${(new Date).toLocaleTimeString()}]`) : `[${(new Date).toLocaleTimeString()}]`;
             },
             template: []
         }, { template: [], tag: 'first' });
@@ -71,7 +71,7 @@ export class Logger extends Function {
      */
     private _addStyle(style: keyof _chalk.ChalkStyleMap) {
         const layer = this._currentLayer;
-        if (!isBrowser) {   //浏览器没有样式
+        if (isNode) {   //浏览器没有样式
             layer.style = layer.style === undefined ? chalk[style] : layer.style[style];
         }
     }
@@ -130,7 +130,7 @@ export class Logger extends Function {
 
             case 'noTime':
                 if (this.sequenceIndex === 1) // 这个放在开头不计数
-                    this.sequenceIndex = 0;   
+                    this.sequenceIndex = 0;
                 this._formatArray[0].skip = true;
                 break;
 
