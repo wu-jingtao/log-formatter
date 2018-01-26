@@ -62,6 +62,14 @@ export interface LoggerPublicProperties {
     readonly noTime: LoggerPublicProperties;
 
     /**
+     * 显示时间的同时显示日期
+     * 
+     * @type {LoggerPublicProperties}
+     * @memberof LoggerPublicProperties
+     */
+    readonly showDate: LoggerPublicProperties;
+
+    /**
      * 定位文本位置
      * 
      * @type {LoggerPublicProperties}

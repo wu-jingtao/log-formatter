@@ -1,4 +1,5 @@
 import * as _chalk from 'chalk';
+import * as moment from 'moment';
 const isNode = require('is-node');
 const chalk: typeof _chalk = isNode ? require.call(undefined, 'chalk') : undefined;  //浏览器不进行样式格式化，同时防止webpack打包时引入chalk
 
@@ -36,7 +37,7 @@ export class Logger extends Function {
         this._formatArray.push({
             tag: "time",
             get text() {
-                return isNode ? chalk.gray(`[${(new Date).toLocaleTimeString()}]`) : `[${(new Date).toLocaleTimeString()}]`;
+                return isNode ? chalk.gray(`[${moment().format('HH:mm:ss')}]`) : `[${moment().format('HH:mm:ss')}]`;
             },
             template: []
         }, { template: [], tag: 'first' });
@@ -132,6 +133,16 @@ export class Logger extends Function {
                 if (this.sequenceIndex === 1) // 这个放在开头不计数
                     this.sequenceIndex = 0;
                 this._formatArray[0].skip = true;
+                break;
+
+            case 'showDate':
+                if (this.sequenceIndex === 1) // 这个放在开头不计数
+                    this.sequenceIndex = 0;
+                Object.defineProperty(this._formatArray[0], 'text', {
+                    get() {
+                        return isNode ? chalk.gray(`[${moment().format('YYYY-MM-DD HH:mm:ss')}]`) : `[${moment().format('YYYY-MM-DD HH:mm:ss')}]`;
+                    }
+                });
                 break;
 
             case 'text':

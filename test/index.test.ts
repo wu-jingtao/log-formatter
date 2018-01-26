@@ -19,7 +19,7 @@ format('location', 'title', new Error('测试打印错误'));
 
 log.line(undefined, 10);
 
-log.warn
+log.warn.showDate
     .location
     .title.blue
     .content.red
