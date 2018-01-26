@@ -33,7 +33,7 @@ export interface FormatLayer {
      * @type {any}
      * @memberof FormatLayer
      */
-    tag?: any;
+    tags?: any[];
     /**
      * 是否跳过这一层
      *

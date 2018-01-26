@@ -1,6 +1,6 @@
 {
     "name": "log-formatter",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "description": "结合chalk，提供了一种方便格式化log输出的方式",
     "main": "./bin/index.js",
     "types": "./bin/index.d.ts",

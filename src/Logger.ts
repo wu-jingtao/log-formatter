@@ -35,12 +35,26 @@ export class Logger extends Function {
 
         // 第一层默认是当前时间
         this._formatArray.push({
-            tag: "time",
+            tags: ["time"],
             get text() {
-                return isNode ? chalk.gray(`[${moment().format('HH:mm:ss')}]`) : `[${moment().format('HH:mm:ss')}]`;
+                const tags = new Set(this.tags);
+
+                if (!tags.has('noDate') && !tags.has('noTime')) {
+                    const text = `[${moment().format('YYYY-MM-DD HH:mm:ss')}]`;
+                    return isNode ? chalk.gray(text) : text;
+                } else if (tags.has('noDate')) {
+                    const text = `[${moment().format('HH:mm:ss')}]`;
+                    return isNode ? chalk.gray(text) : text;
+                } else if (tags.has('noTime')) {
+                    const text = `[${moment().format('YYYY-MM-DD')}]`;
+                    return isNode ? chalk.gray(text) : text;
+                } else {
+                    this.skip = true;   //如果时间和日期都不显示就跳过
+                    return '';
+                }
             },
             template: []
-        }, { template: [], tag: 'first' });
+        }, { template: [], tags: ['first'] });
     }
 
     /**
@@ -132,17 +146,13 @@ export class Logger extends Function {
             case 'noTime':
                 if (this.sequenceIndex === 1) // 这个放在开头不计数
                     this.sequenceIndex = 0;
-                this._formatArray[0].skip = true;
+                (this._formatArray[0].tags as any).push('noTime');
                 break;
 
-            case 'showDate':
+            case 'noDate':
                 if (this.sequenceIndex === 1) // 这个放在开头不计数
                     this.sequenceIndex = 0;
-                Object.defineProperty(this._formatArray[0], 'text', {
-                    get() {
-                        return isNode ? chalk.gray(`[${moment().format('YYYY-MM-DD HH:mm:ss')}]`) : `[${moment().format('YYYY-MM-DD HH:mm:ss')}]`;
-                    }
-                });
+                (this._formatArray[0].tags as any).push('noDate');
                 break;
 
             case 'text':
