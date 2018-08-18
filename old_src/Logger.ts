@@ -1,7 +1,5 @@
 import * as _chalk from 'chalk';
 import * as moment from 'moment';
-const isNode = require('is-node');
-const chalk: typeof _chalk = isNode ? require.call(undefined, 'chalk') : undefined;  //浏览器不进行样式格式化，同时防止webpack打包时引入chalk
 
 import { LogType } from './LogType';
 import { LoggerPublicProperties } from './LoggerPublicProperties';

@@ -1,12 +1,12 @@
 {
     "name": "log-formatter",
-    "version": "0.1.8",
+    "version": "1.0.0",
     "description": "结合chalk，提供了一种方便格式化log输出的方式",
     "main": "./bin/index.js",
     "types": "./bin/index.d.ts",
     "scripts": {
-        "test": "./node_modules/.bin/ts-node ./test/index.test.ts",
-        "compile": "./node_modules/.bin/gulp compile"
+        "test": "mocha --require ts-node/register ./test/index.test.ts",
+        "compile": "gulp compile"
     },
     "keywords": [
         "log",
@@ -21,26 +21,19 @@
     },
     "homepage": "https://github.com/mx601595686/log-formatter#readme",
     "devDependencies": {
-        "@types/fs-extra": "^4.0.2",
-        "@types/node": "^7.0.13",
-        "@types/opener": "^1.4.0",
-        "@types/webpack": "^3.0.10",
-        "@types/memory-fs": "^0.3.0",
-        "memory-fs": "^0.4.1",
-        "fs-extra": "^4.0.2",
+        "@types/expect.js": "^0.3.29",
+        "@types/mocha": "^5.2.5",
+        "@types/node": "^10.5.4",
+        "expect.js": "^0.3.1",
         "gulp": "^3.9.1",
         "gulp-sourcemaps": "^2.4.1",
-        "gulp-typescript": "^3.1.5",
-        "opener": "^1.4.3",
-        "ts-loader": "^2.3.7",
-        "ts-node": "^3.0.4",
-        "typescript": "^2.5.2",
-        "webpack": "^3.6.0"
+        "gulp-typescript": "^5.0.0-alpha.3",
+        "mocha": "^5.2.0",
+        "ts-node": "^7.0.0",
+        "typescript": "^3.0.1"
     },
     "dependencies": {
-        "@types/chalk": "^0.4.31",
-        "chalk": "^2.1.0",
-        "is-node": "1.0.2",
-        "moment": "^2.20.1"
+        "chalk": "^2.4.1",
+        "moment": "^2.22.2"
     }
 }

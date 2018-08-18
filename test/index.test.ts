@@ -1,26 +1,24 @@
-import log from '../src/index';
+import expect = require('expect.js');
 
-log.lineWithText('不带连缀');
+describe('测试模块', function () {
 
-//测试数据
-const args = [0, 1.1, 'string', true, false, null, undefined, { a: 123 }, [456], Buffer.alloc(10).fill(1)];
-log(...args);
-log.warn(...args);
-log.error(...args);
+    before(function () {
+        // 所有测试开始之前执行
+    });
 
-log.lineWithText('连缀用法');
+    after(function () {
+        // 所有测试结束之后执行
+    });
 
-const format = log.noTime
-    .location.round.mustache
-    .title.bold.green
-    .content.yellow;
+    beforeEach(function () {
+        // 每个测试开始之前执行
+    });
 
-format('location', 'title', new Error('测试打印错误'));
+    afterEach(function () {
+        // 每个测试结束之后执行
+    });
 
-log.line(undefined, 10);
-
-log.warn.noDate
-    .location
-    .title.blue
-    .content.red
-    .text.green(`location`, 'title', `content`, 'text');
+    it('测试单元', function () {
+        expect('something').to.be.a('string');
+    });
+});
