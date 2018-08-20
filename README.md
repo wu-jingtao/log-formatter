@@ -10,6 +10,4 @@ import log from 'log-formatter';
 const log = require('log-formatter').default;
 ```
 
-[API](./bin/LoggerPublicProperties.d.ts)   
-
 [DEMO](./test/index.test.ts)
