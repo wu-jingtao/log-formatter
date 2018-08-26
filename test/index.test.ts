@@ -53,11 +53,11 @@ describe('测试 json缩进', function () {
 
     it('测试不使用缩进', function () {
         expect(log.noDatetime.format(obj)).to
-            .be((util as any /* 这里由于 tsd 缺失了定义，等待版本更新后可以删除 */).formatWithOptions({ compact: true }, obj));
+            .be(util.formatWithOptions({ compact: true }, obj as any));
     });
 
     it('测试使用缩进', function () {
-        expect(log.noDatetime.indentJson.format(obj)).to.be((util as any).formatWithOptions({ compact: false }, obj));
+        expect(log.noDatetime.indentJson.format(obj)).to.be(util.formatWithOptions({ compact: false }, obj as any));
     });
 });
 

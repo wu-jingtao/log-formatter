@@ -118,12 +118,12 @@ export class LogFormatter extends Function {
                     if (text !== undefined)
                         transformed_string = template.reduce((pre, template) => template(pre), text);
                     else
-                        transformed_string = template.reduce((pre, template) => template(pre), (util as any /* 这里由于 tsd 缺失了定义，等待版本更新后可以删除 */).formatWithOptions({ compact: !this._indentJson }, args[arg_index++]));
+                        transformed_string = template.reduce((pre, template) => template(pre), util.formatWithOptions({ compact: !this._indentJson }, args[arg_index++]));
 
                     result.push(style(transformed_string));
                 }
             } else {
-                const transformed_string = lastLayerTemplate.reduce((pre, template) => template(pre), (util as any).formatWithOptions({ compact: !this._indentJson }, args[arg_index++]));
+                const transformed_string = lastLayerTemplate.reduce((pre, template) => template(pre), util.formatWithOptions({ compact: !this._indentJson }, args[arg_index++]));
                 result.push(lastLayerStyle(transformed_string));
             }
         }
@@ -336,7 +336,7 @@ export class LogFormatter extends Function {
     get white(): this { return this._invokeChalkProperty('white'); }
     get gray(): this { return this._invokeChalkProperty('gray'); }
     get grey(): this { return this._invokeChalkProperty('grey'); }
-    
+
     get blackBright(): this { return this._invokeChalkProperty('blackBright'); }
     get redBright(): this { return this._invokeChalkProperty('redBright'); }
     get greenBright(): this { return this._invokeChalkProperty('greenBright'); }
@@ -354,7 +354,7 @@ export class LogFormatter extends Function {
     get bgMagenta(): this { return this._invokeChalkProperty('bgMagenta'); }
     get bgCyan(): this { return this._invokeChalkProperty('bgCyan'); }
     get bgWhite(): this { return this._invokeChalkProperty('bgWhite'); }
-    
+
     get bgBlackBright(): this { return this._invokeChalkProperty('bgBlackBright'); }
     get bgRedBright(): this { return this._invokeChalkProperty('bgRedBright'); }
     get bgGreenBright(): this { return this._invokeChalkProperty('bgGreenBright'); }
