@@ -9,6 +9,8 @@ it('测试 输出到控制台', function () {
     log.blue.line();    //蓝色分割线
     log.bgYellow.whiteBright.bold('用肉眼检测一下。下面输出的样式是否符合要求');
 
+    log('普通样式');
+
     log
         .location
         .text.cyan.bold('log', '蓝色粗体');
