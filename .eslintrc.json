@@ -1,0 +1,6 @@
+{
+    "extends": "sufu",
+    "rules": {
+        "no-unused-expressions": "off"
+    }
+}

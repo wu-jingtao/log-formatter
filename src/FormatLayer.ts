@@ -1,14 +1,13 @@
-import { Chalk } from "chalk";
+import { Chalk } from 'chalk';
 
 /**
  * 样式层
  */
-export interface FormatLayer {
-
+export interface IFormatLayer {
     style: Chalk;
 
     /**
-     * 在字符串被Chalk之前，对文本内容进行修改
+     * 在字符串被Chalk格式化之前，对文本内容进行修改
      */
     template: ((value: string) => string)[];
 
@@ -32,5 +31,5 @@ export interface FormatLayer {
          * 日期显示格式，这个主要是给第一层格式化时间使用的
          */
         timeFormat?: number;
-    }
+    };
 }

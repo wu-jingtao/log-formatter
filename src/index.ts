@@ -1,9 +1,9 @@
-import { LogFormatter } from "./LogFormatter";
-import { LogFormatter_Proxy } from "./LogFormatter_Proxy";
+import { ILogFormatterProxy } from './ILogFormatterProxy';
+import { LogFormatter } from './LogFormatter';
 
-const __LogFormatter_Proxy = new Proxy(new LogFormatter, {
+const logFormatter = new Proxy(new LogFormatter(), {
     get(target, property) {
-        const logger: any = new Proxy(new LogFormatter, {
+        const logger: any = new Proxy(new LogFormatter(), {
             apply(target, thisArg, argArray) {
                 target.print(...argArray);
             }
@@ -14,6 +14,6 @@ const __LogFormatter_Proxy = new Proxy(new LogFormatter, {
     apply(target, thisArg, argArray) {
         target.print(...argArray);
     }
-}) as LogFormatter_Proxy;
+}) as ILogFormatterProxy;
 
-export default __LogFormatter_Proxy;
+export default logFormatter;
