@@ -1,7 +1,5 @@
 *
 !src
 !src/**/*.ts
-!src/**/*.tsx
 !test
 !test/**/*.ts
-!test/**/*.tsx
