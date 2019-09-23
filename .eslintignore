@@ -1,5 +1,0 @@
-*
-!src
-!src/**/*.ts
-!test
-!test/**/*.ts
