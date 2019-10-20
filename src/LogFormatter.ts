@@ -5,7 +5,7 @@ import chalk, { Chalk } from 'chalk';
 import { IFormatLayer } from './FormatLayer';
 
 export class LogFormatter extends Function {
-    //#region 私有属性与方法
+    // #region 私有属性与方法
 
     /**
      * 是否自动缩进对象输出
@@ -49,7 +49,7 @@ export class LogFormatter extends Function {
     constructor() {
         super();
 
-        //第一层默认是时间
+        // 第一层默认是时间
         this._formatLayer.push({
             style: chalk.gray,
             template: [v => `[${v}]`],
@@ -58,25 +58,21 @@ export class LogFormatter extends Function {
                     case 0:
                         return moment().format('YYYY-MM-DD HH:mm:ss');
 
-                    case 1: //noTime
+                    case 1: // noTime
                         return moment().format('YYYY-MM-DD');
 
-                    case 2: //noDate
+                    case 2: // noDate
                         return moment().format('HH:mm:ss');
                 }
             },
             setting: {
-                hasUsed: true,
-                //日期显示格式
-                timeFormat: 0,
-                //判断是否跳过当前层
-                get skip() {
-                    return this.timeFormat > 2;
-                }
+                hasUsed: true, // 日期显示格式
+                timeFormat: 0, // 判断是否跳过当前层
+                get skip() { return this.timeFormat > 2 }
             }
         });
 
-        //再添加一层是为了让用户可以在设置第一个样式之前可以不调用text
+        // 再添加一层是为了让用户可以在设置第一个样式之前可以不调用text
         this._unusedText;
     }
 
@@ -98,9 +94,9 @@ export class LogFormatter extends Function {
         return this;
     }
 
-    //#endregion
+    // #endregion
 
-    //#region 格式化输出
+    // #region 格式化输出
 
     /**
      * 格式化传入的参数，但不打印到console
@@ -113,26 +109,19 @@ export class LogFormatter extends Function {
         for (let argIndex = 0, formatIndex = 0; argIndex < args.length; formatIndex++) {
             if (formatIndex < this._formatLayer.length) {
                 const { style, template, text, setting } = this._formatLayer[formatIndex];
-                //判断是否跳过当前层
-                if (!setting.skip) {
+
+                if (!setting.skip) { // 判断是否跳过当前层
                     let transformedString: string;
 
-                    if (text !== undefined) {
+                    if (text !== undefined)
                         transformedString = template.reduce((pre, template) => template(pre), text);
-                    } else {
-                        transformedString = template.reduce(
-                            (pre, template) => template(pre),
-                            util.formatWithOptions({ compact: !this._indentJson }, args[argIndex++])
-                        );
-                    }
+                    else
+                        transformedString = template.reduce((pre, template) => template(pre), util.formatWithOptions({ compact: !this._indentJson }, args[argIndex++]));
 
                     result.push(style(transformedString));
                 }
             } else {
-                const transformedString = lastLayerTemplate.reduce(
-                    (pre, template) => template(pre),
-                    util.formatWithOptions({ compact: !this._indentJson }, args[argIndex++])
-                );
+                const transformedString = lastLayerTemplate.reduce((pre, template) => template(pre), util.formatWithOptions({ compact: !this._indentJson }, args[argIndex++]));
                 result.push(lastLayerStyle(transformedString));
             }
         }
@@ -157,9 +146,9 @@ export class LogFormatter extends Function {
         console[this._logType](style(char.repeat(length)));
     }
 
-    //#endregion
+    // #endregion
 
-    //#region 输出类型设置
+    // #region 输出类型设置
 
     /**
      * 通过console.log进行输出，这个是默认选项
@@ -193,9 +182,9 @@ export class LogFormatter extends Function {
         return this;
     }
 
-    //#endregion
+    // #endregion
 
-    //#region 时间格式设置
+    // #region 时间格式设置
 
     /**
      * 不显示时间
@@ -221,9 +210,9 @@ export class LogFormatter extends Function {
         return this;
     }
 
-    //#endregion
+    // #endregion
 
-    //#region 新建样式层属性
+    // #region 新建样式层属性
 
     /**
      * 创建一层新的样式，用于格式化下一个传入参数
@@ -232,8 +221,8 @@ export class LogFormatter extends Function {
         const lastLayer = this._lastFormatLayer;
         if (lastLayer.setting.hasUsed)
             this._formatLayer.push({ style: chalk, template: [], setting: { hasUsed: true } });
-        //如果最后一层还没有用过就不在添加新的了
-        else lastLayer.setting.hasUsed = true;
+        else
+            lastLayer.setting.hasUsed = true; // 如果最后一层还没有用过就不在添加新的了
 
         return this;
     }
@@ -275,9 +264,9 @@ export class LogFormatter extends Function {
         return this.text.square;
     }
 
-    //#endregion
+    // #endregion
 
-    //#region 样式模板
+    // #region 样式模板
 
     /**
      * 用方括号包裹要输出的文本内容
@@ -303,185 +292,75 @@ export class LogFormatter extends Function {
         return this;
     }
 
-    //#endregion
+    // #endregion
 
-    //#region chalk的方法
+    // #region chalk的方法
 
-    rgb(r: number, g: number, b: number): this {
-        return this._invokeChalkFunction('rgb', r, g, b);
-    }
-    hsl(h: number, s: number, l: number): this {
-        return this._invokeChalkFunction('hsl', h, s, l);
-    }
-    hsv(h: number, s: number, v: number): this {
-        return this._invokeChalkFunction('hsv', h, s, v);
-    }
-    hwb(h: number, w: number, b: number): this {
-        return this._invokeChalkFunction('hwb', h, w, b);
-    }
-    hex(color: string): this {
-        return this._invokeChalkFunction('hex', color);
-    }
-    keyword(color: string): this {
-        return this._invokeChalkFunction('keyword', color);
-    }
-    bgRgb(r: number, g: number, b: number): this {
-        return this._invokeChalkFunction('bgRgb', r, g, b);
-    }
-    bgHsl(h: number, s: number, l: number): this {
-        return this._invokeChalkFunction('bgHsl', h, s, l);
-    }
-    bgHsv(h: number, s: number, v: number): this {
-        return this._invokeChalkFunction('bgHsv', h, s, v);
-    }
-    bgHwb(h: number, w: number, b: number): this {
-        return this._invokeChalkFunction('bgHwb', h, w, b);
-    }
-    bgHex(color: string): this {
-        return this._invokeChalkFunction('bgHex', color);
-    }
-    bgKeyword(color: string): this {
-        return this._invokeChalkFunction('bgKeyword', color);
-    }
+    rgb(r: number, g: number, b: number): this { return this._invokeChalkFunction('rgb', r, g, b) }
+    hsl(h: number, s: number, l: number): this { return this._invokeChalkFunction('hsl', h, s, l) }
+    hsv(h: number, s: number, v: number): this { return this._invokeChalkFunction('hsv', h, s, v) }
+    hwb(h: number, w: number, b: number): this { return this._invokeChalkFunction('hwb', h, w, b) }
+    hex(color: string): this { return this._invokeChalkFunction('hex', color) }
+    keyword(color: string): this { return this._invokeChalkFunction('keyword', color) }
+    bgRgb(r: number, g: number, b: number): this { return this._invokeChalkFunction('bgRgb', r, g, b) }
+    bgHsl(h: number, s: number, l: number): this { return this._invokeChalkFunction('bgHsl', h, s, l) }
+    bgHsv(h: number, s: number, v: number): this { return this._invokeChalkFunction('bgHsv', h, s, v) }
+    bgHwb(h: number, w: number, b: number): this { return this._invokeChalkFunction('bgHwb', h, w, b) }
+    bgHex(color: string): this { return this._invokeChalkFunction('bgHex', color) }
+    bgKeyword(color: string): this { return this._invokeChalkFunction('bgKeyword', color) }
 
-    //#endregion
+    // #endregion
 
-    //#region chalk的属性
+    // #region chalk的属性
 
-    get reset(): this {
-        return this._invokeChalkProperty('reset');
-    }
-    get bold(): this {
-        return this._invokeChalkProperty('bold');
-    }
-    get dim(): this {
-        return this._invokeChalkProperty('dim');
-    }
-    get italic(): this {
-        return this._invokeChalkProperty('italic');
-    }
-    get underline(): this {
-        return this._invokeChalkProperty('underline');
-    }
-    get inverse(): this {
-        return this._invokeChalkProperty('inverse');
-    }
-    get hidden(): this {
-        return this._invokeChalkProperty('hidden');
-    }
-    get strikethrough(): this {
-        return this._invokeChalkProperty('strikethrough');
-    }
+    get reset(): this { return this._invokeChalkProperty('reset') }
+    get bold(): this { return this._invokeChalkProperty('bold') }
+    get dim(): this { return this._invokeChalkProperty('dim') }
+    get italic(): this { return this._invokeChalkProperty('italic') }
+    get underline(): this { return this._invokeChalkProperty('underline') }
+    get inverse(): this { return this._invokeChalkProperty('inverse') }
+    get hidden(): this { return this._invokeChalkProperty('hidden') }
+    get strikethrough(): this { return this._invokeChalkProperty('strikethrough') }
 
-    get visible(): this {
-        return this._invokeChalkProperty('visible');
-    }
+    get visible(): this { return this._invokeChalkProperty('visible') }
 
-    get black(): this {
-        return this._invokeChalkProperty('black');
-    }
-    get red(): this {
-        return this._invokeChalkProperty('red');
-    }
-    get green(): this {
-        return this._invokeChalkProperty('green');
-    }
-    get yellow(): this {
-        return this._invokeChalkProperty('yellow');
-    }
-    get blue(): this {
-        return this._invokeChalkProperty('blue');
-    }
-    get magenta(): this {
-        return this._invokeChalkProperty('magenta');
-    }
-    get cyan(): this {
-        return this._invokeChalkProperty('cyan');
-    }
-    get white(): this {
-        return this._invokeChalkProperty('white');
-    }
-    get gray(): this {
-        return this._invokeChalkProperty('gray');
-    }
-    get grey(): this {
-        return this._invokeChalkProperty('grey');
-    }
+    get black(): this { return this._invokeChalkProperty('black') }
+    get red(): this { return this._invokeChalkProperty('red') }
+    get green(): this { return this._invokeChalkProperty('green') }
+    get yellow(): this { return this._invokeChalkProperty('yellow') }
+    get blue(): this { return this._invokeChalkProperty('blue') }
+    get magenta(): this { return this._invokeChalkProperty('magenta') }
+    get cyan(): this { return this._invokeChalkProperty('cyan') }
+    get white(): this { return this._invokeChalkProperty('white') }
+    get gray(): this { return this._invokeChalkProperty('gray') }
+    get grey(): this { return this._invokeChalkProperty('grey') }
 
-    get blackBright(): this {
-        return this._invokeChalkProperty('blackBright');
-    }
-    get redBright(): this {
-        return this._invokeChalkProperty('redBright');
-    }
-    get greenBright(): this {
-        return this._invokeChalkProperty('greenBright');
-    }
-    get yellowBright(): this {
-        return this._invokeChalkProperty('yellowBright');
-    }
-    get blueBright(): this {
-        return this._invokeChalkProperty('blueBright');
-    }
-    get magentaBright(): this {
-        return this._invokeChalkProperty('magentaBright');
-    }
-    get cyanBright(): this {
-        return this._invokeChalkProperty('cyanBright');
-    }
-    get whiteBright(): this {
-        return this._invokeChalkProperty('whiteBright');
-    }
+    get blackBright(): this { return this._invokeChalkProperty('blackBright') }
+    get redBright(): this { return this._invokeChalkProperty('redBright') }
+    get greenBright(): this { return this._invokeChalkProperty('greenBright') }
+    get yellowBright(): this { return this._invokeChalkProperty('yellowBright') }
+    get blueBright(): this { return this._invokeChalkProperty('blueBright') }
+    get magentaBright(): this { return this._invokeChalkProperty('magentaBright') }
+    get cyanBright(): this { return this._invokeChalkProperty('cyanBright') }
+    get whiteBright(): this { return this._invokeChalkProperty('whiteBright') }
 
-    get bgBlack(): this {
-        return this._invokeChalkProperty('bgBlack');
-    }
-    get bgRed(): this {
-        return this._invokeChalkProperty('bgRed');
-    }
-    get bgGreen(): this {
-        return this._invokeChalkProperty('bgGreen');
-    }
-    get bgYellow(): this {
-        return this._invokeChalkProperty('bgYellow');
-    }
-    get bgBlue(): this {
-        return this._invokeChalkProperty('bgBlue');
-    }
-    get bgMagenta(): this {
-        return this._invokeChalkProperty('bgMagenta');
-    }
-    get bgCyan(): this {
-        return this._invokeChalkProperty('bgCyan');
-    }
-    get bgWhite(): this {
-        return this._invokeChalkProperty('bgWhite');
-    }
+    get bgBlack(): this { return this._invokeChalkProperty('bgBlack') }
+    get bgRed(): this { return this._invokeChalkProperty('bgRed') }
+    get bgGreen(): this { return this._invokeChalkProperty('bgGreen') }
+    get bgYellow(): this { return this._invokeChalkProperty('bgYellow') }
+    get bgBlue(): this { return this._invokeChalkProperty('bgBlue') }
+    get bgMagenta(): this { return this._invokeChalkProperty('bgMagenta') }
+    get bgCyan(): this { return this._invokeChalkProperty('bgCyan') }
+    get bgWhite(): this { return this._invokeChalkProperty('bgWhite') }
 
-    get bgBlackBright(): this {
-        return this._invokeChalkProperty('bgBlackBright');
-    }
-    get bgRedBright(): this {
-        return this._invokeChalkProperty('bgRedBright');
-    }
-    get bgGreenBright(): this {
-        return this._invokeChalkProperty('bgGreenBright');
-    }
-    get bgYellowBright(): this {
-        return this._invokeChalkProperty('bgYellowBright');
-    }
-    get bgBlueBright(): this {
-        return this._invokeChalkProperty('bgBlueBright');
-    }
-    get bgMagentaBright(): this {
-        return this._invokeChalkProperty('bgMagentaBright');
-    }
-    get bgCyanBright(): this {
-        return this._invokeChalkProperty('bgCyanBright');
-    }
-    get bgWhiteBright(): this {
-        return this._invokeChalkProperty('bgWhiteBright');
-    }
+    get bgBlackBright(): this { return this._invokeChalkProperty('bgBlackBright') }
+    get bgRedBright(): this { return this._invokeChalkProperty('bgRedBright') }
+    get bgGreenBright(): this { return this._invokeChalkProperty('bgGreenBright') }
+    get bgYellowBright(): this { return this._invokeChalkProperty('bgYellowBright') }
+    get bgBlueBright(): this { return this._invokeChalkProperty('bgBlueBright') }
+    get bgMagentaBright(): this { return this._invokeChalkProperty('bgMagentaBright') }
+    get bgCyanBright(): this { return this._invokeChalkProperty('bgCyanBright') }
+    get bgWhiteBright(): this { return this._invokeChalkProperty('bgWhiteBright') }
 
-    //#endregion
+    // #endregion
 }

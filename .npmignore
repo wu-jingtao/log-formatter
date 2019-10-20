@@ -2,7 +2,6 @@
 .vscode/
 .eslintrc.json
 .gitattributes
-.prettierrc.js
 !bin/
 src/
 test/
