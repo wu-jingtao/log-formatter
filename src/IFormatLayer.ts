@@ -4,6 +4,9 @@ import { Chalk } from 'chalk';
  * 样式层
  */
 export interface IFormatLayer {
+    /**
+     * 当前层的样式
+     */
     style: Chalk;
 
     /**

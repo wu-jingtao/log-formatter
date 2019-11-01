@@ -2,7 +2,7 @@ import * as moment from 'moment';
 import * as util from 'util';
 import chalk, { Chalk } from 'chalk';
 
-import { IFormatLayer } from './FormatLayer';
+import { IFormatLayer } from './IFormatLayer';
 
 export class LogFormatter extends Function {
     // #region 私有属性与方法
@@ -66,8 +66,8 @@ export class LogFormatter extends Function {
                 }
             },
             setting: {
-                hasUsed: true, // 日期显示格式
-                timeFormat: 0, // 判断是否跳过当前层
+                hasUsed: true,
+                timeFormat: 0,
                 get skip() { return this.timeFormat > 2 }
             }
         });
@@ -111,12 +111,10 @@ export class LogFormatter extends Function {
                 const { style, template, text, setting } = this._formatLayer[formatIndex];
 
                 if (!setting.skip) { // 判断是否跳过当前层
-                    let transformedString: string;
-
                     if (text !== undefined)
-                        transformedString = template.reduce((pre, template) => template(pre), text);
+                        var transformedString = template.reduce((pre, template) => template(pre), text);
                     else
-                        transformedString = template.reduce((pre, template) => template(pre), util.formatWithOptions({ compact: !this._indentJson }, args[argIndex++]));
+                        var transformedString = template.reduce((pre, template) => template(pre), util.formatWithOptions({ compact: !this._indentJson }, args[argIndex++]));
 
                     result.push(style(transformedString));
                 }
@@ -141,7 +139,7 @@ export class LogFormatter extends Function {
      * @param char 分隔符字符
      * @param length 分隔符长度。默认等于终端窗口长度
      */
-    line(char = '-', length: number = process.stdout.columns || 80): void {
+    line(char = '-', length = process.stdout.columns || 80): void {
         const { style } = this._formatLayer[1];
         console[this._logType](style(char.repeat(length)));
     }
