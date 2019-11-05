@@ -1,7 +1,7 @@
-import * as moment from 'moment';
-import * as util from 'util';
+import moment from 'moment';
+import util from 'util';
+import expect from 'expect.js';
 import chalk from 'chalk';
-import expect = require('expect.js');
 
 import log from '../src';
 

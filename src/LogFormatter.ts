@@ -1,5 +1,5 @@
-import * as moment from 'moment';
-import * as util from 'util';
+import moment from 'moment';
+import util from 'util';
 import chalk, { Chalk } from 'chalk';
 
 import { IFormatLayer } from './IFormatLayer';

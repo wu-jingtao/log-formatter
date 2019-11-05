@@ -1,18 +1,19 @@
 {
-  "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2018",
-    "removeComments": false,
-    "preserveConstEnums": false,
-    "declaration": true,
-    "experimentalDecorators": false,
-    "noEmitOnError": true,
-    "strict": true,
-    "strictPropertyInitialization": false,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "forceConsistentCasingInFileNames": true,
-    "lib": ["esnext"]
-  },
-  "exclude": ["node_modules", "bin"]
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es2018",
+        "removeComments": false,
+        "preserveConstEnums": false,
+        "declaration": true,
+        "experimentalDecorators": false,
+        "noEmitOnError": true,
+        "strict": true,
+        "strictPropertyInitialization": false,
+        "skipLibCheck": true,
+        "resolveJsonModule": true,
+        "forceConsistentCasingInFileNames": true,
+        "esModuleInterop": true,
+        "lib": ["esnext"]
+    },
+    "exclude": ["node_modules", "bin"]
 }
