@@ -139,13 +139,13 @@ it('测试 样式模板', function () {
 
 it('测试 chalk的方法', function () {
     const actual = log.noDatetime
-        .rgb(1, 2, 3).hsl(1, 2, 3).hsv(1, 2, 3).hwb(1, 2, 3).hex('#DEADED').keyword('orange')
-        .bgRgb(1, 2, 3).bgHsl(1, 2, 3).bgHsv(1, 2, 3).bgHwb(1, 2, 3).bgHex('#DEADED').bgKeyword('orange')
+        .ansi(36).ansi256(18).rgb(1, 2, 3).hsl(1, 2, 3).hsv(1, 2, 3).hwb(1, 2, 3).hex('#DEADED').keyword('orange')
+        .bgAnsi(36).bgAnsi256(18).bgRgb(1, 2, 3).bgHsl(1, 2, 3).bgHsv(1, 2, 3).bgHwb(1, 2, 3).bgHex('#DEADED').bgKeyword('orange')
         .format(1);
 
     const expected = chalk
-        .rgb(1, 2, 3).hsl(1, 2, 3).hsv(1, 2, 3).hwb(1, 2, 3).hex('#DEADED').keyword('orange')
-        .bgRgb(1, 2, 3).bgHsl(1, 2, 3).bgHsv(1, 2, 3).bgHwb(1, 2, 3).bgHex('#DEADED').bgKeyword('orange')('1');
+        .ansi(36).ansi256(18).rgb(1, 2, 3).hsl(1, 2, 3).hsv(1, 2, 3).hwb(1, 2, 3).hex('#DEADED').keyword('orange')
+        .bgAnsi(36).bgAnsi256(18).bgRgb(1, 2, 3).bgHsl(1, 2, 3).bgHsv(1, 2, 3).bgHwb(1, 2, 3).bgHex('#DEADED').bgKeyword('orange')('1');
 
     expect(actual).to.be(expected);
 });

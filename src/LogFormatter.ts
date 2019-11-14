@@ -1,6 +1,6 @@
 import moment from 'moment';
 import util from 'util';
-import chalk, { Chalk } from 'chalk';
+import chalk from 'chalk';
 
 import { IFormatLayer } from './IFormatLayer';
 
@@ -79,7 +79,7 @@ export class LogFormatter extends Function {
     /**
      * 为最后一层设置样式，调用chalk的方法
      */
-    private _invokeChalkFunction(name: keyof Chalk, ...args: any[]): this {
+    private _invokeChalkFunction(name: keyof chalk.Chalk, ...args: any[]): this {
         const lastLayer = this._getLastFormatLayerAndSetHasUsed;
         lastLayer.style = (lastLayer.style as any)[name](...args);
         return this;
@@ -88,7 +88,7 @@ export class LogFormatter extends Function {
     /**
      * 为最后一层设置样式，调用chalk的属性
      */
-    private _invokeChalkProperty(name: keyof Chalk): this {
+    private _invokeChalkProperty(name: keyof chalk.Chalk): this {
         const lastLayer = this._getLastFormatLayerAndSetHasUsed;
         lastLayer.style = (lastLayer.style as any)[name];
         return this;
@@ -294,12 +294,16 @@ export class LogFormatter extends Function {
 
     // #region chalk的方法
 
+    ansi(code: number): this { return this._invokeChalkFunction('ansi', code) }
+    ansi256(index: number): this { return this._invokeChalkFunction('ansi256', index) }
     rgb(r: number, g: number, b: number): this { return this._invokeChalkFunction('rgb', r, g, b) }
     hsl(h: number, s: number, l: number): this { return this._invokeChalkFunction('hsl', h, s, l) }
     hsv(h: number, s: number, v: number): this { return this._invokeChalkFunction('hsv', h, s, v) }
     hwb(h: number, w: number, b: number): this { return this._invokeChalkFunction('hwb', h, w, b) }
     hex(color: string): this { return this._invokeChalkFunction('hex', color) }
     keyword(color: string): this { return this._invokeChalkFunction('keyword', color) }
+    bgAnsi(code: number): this { return this._invokeChalkFunction('ansi', code) }
+    bgAnsi256(index: number): this { return this._invokeChalkFunction('ansi256', index) }
     bgRgb(r: number, g: number, b: number): this { return this._invokeChalkFunction('bgRgb', r, g, b) }
     bgHsl(h: number, s: number, l: number): this { return this._invokeChalkFunction('bgHsl', h, s, l) }
     bgHsv(h: number, s: number, v: number): this { return this._invokeChalkFunction('bgHsv', h, s, v) }
@@ -319,7 +323,6 @@ export class LogFormatter extends Function {
     get inverse(): this { return this._invokeChalkProperty('inverse') }
     get hidden(): this { return this._invokeChalkProperty('hidden') }
     get strikethrough(): this { return this._invokeChalkProperty('strikethrough') }
-
     get visible(): this { return this._invokeChalkProperty('visible') }
 
     get black(): this { return this._invokeChalkProperty('black') }
@@ -350,6 +353,7 @@ export class LogFormatter extends Function {
     get bgMagenta(): this { return this._invokeChalkProperty('bgMagenta') }
     get bgCyan(): this { return this._invokeChalkProperty('bgCyan') }
     get bgWhite(): this { return this._invokeChalkProperty('bgWhite') }
+    get bgGray(): this { return this._invokeChalkProperty('bgGray') }
 
     get bgBlackBright(): this { return this._invokeChalkProperty('bgBlackBright') }
     get bgRedBright(): this { return this._invokeChalkProperty('bgRedBright') }

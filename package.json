@@ -1,6 +1,6 @@
 {
     "name": "log-formatter",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "description": "结合chalk，提供了一种方便格式化log输出的方式",
     "main": "./bin/index.js",
     "types": "./bin/index.d.ts",
@@ -27,17 +27,17 @@
     "devDependencies": {
         "@types/expect.js": "^0.3.29",
         "@types/mocha": "^5.2.7",
-        "@types/node": "^12.12.3",
-        "eslint-config-sufu": "^0.1.2",
+        "@types/node": "^12.12.7",
+        "eslint-config-sufu": "^0.1.7",
         "expect.js": "^0.3.1",
         "gulp": "^4.0.2",
         "gulp-typescript": "^5.0.1",
         "mocha": "^6.2.2",
-        "ts-node": "^8.4.1",
-        "typescript": "^3.6.4"
+        "ts-node": "^8.5.0",
+        "typescript": "^3.7.2"
     },
     "dependencies": {
-        "chalk": "^2.4.2",
+        "chalk": "^3.0.0",
         "moment": "^2.24.0"
     }
 }
