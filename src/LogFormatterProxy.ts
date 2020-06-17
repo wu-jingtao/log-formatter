@@ -1,5 +1,5 @@
 import { LogFormatter } from './LogFormatter';
 
-export interface ILogFormatterProxy extends LogFormatter {
+export interface LogFormatterProxy extends LogFormatter {
     (...args: any[]): void;
 }

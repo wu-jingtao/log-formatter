@@ -2,7 +2,7 @@ import moment from 'moment';
 import util from 'util';
 import chalk from 'chalk';
 
-import { IFormatLayer } from './IFormatLayer';
+import { FormatLayer } from './FormatLayer';
 
 export class LogFormatter extends Function {
     // #region 私有属性与方法
@@ -20,7 +20,7 @@ export class LogFormatter extends Function {
     /**
      * 样式层
      */
-    private readonly _formatLayer: IFormatLayer[] = [];
+    private readonly _formatLayer: FormatLayer[] = [];
 
     /**
      * 添加一个未使用样式层
@@ -33,14 +33,14 @@ export class LogFormatter extends Function {
     /**
      * 返回最后一个样式层
      */
-    private get _lastFormatLayer(): IFormatLayer {
+    private get _lastFormatLayer(): FormatLayer {
         return this._formatLayer[this._formatLayer.length - 1];
     }
 
     /**
      * 获取最后一个样式层并将其设置为已经使用过了
      */
-    private get _getLastFormatLayerAndSetHasUsed(): IFormatLayer {
+    private get _getLastFormatLayerAndSetHasUsed(): FormatLayer {  // eslint-disable-line
         const lastLayer = this._lastFormatLayer;
         lastLayer.setting.hasUsed = true;
         return lastLayer;
@@ -73,7 +73,7 @@ export class LogFormatter extends Function {
         });
 
         // 再添加一层是为了让用户可以在设置第一个样式之前可以不调用text
-        this._unusedText;
+        this._unusedText; // eslint-disable-line
     }
 
     /**
@@ -111,15 +111,20 @@ export class LogFormatter extends Function {
                 const { style, template, text, setting } = this._formatLayer[formatIndex];
 
                 if (!setting.skip) { // 判断是否跳过当前层
+                    let transformedString;
                     if (text !== undefined)
-                        var transformedString = template.reduce((pre, template) => template(pre), text);
-                    else
-                        var transformedString = template.reduce((pre, template) => template(pre), util.formatWithOptions({ compact: !this._indentJson }, args[argIndex++]));
+                        transformedString = template.reduce((pre, template) => template(pre), text);
+                    else {
+                        transformedString = template.reduce((pre, template) => template(pre),
+                            util.formatWithOptions({ compact: !this._indentJson }, args[argIndex++]));
+                    }
 
                     result.push(style(transformedString));
                 }
             } else {
-                const transformedString = lastLayerTemplate.reduce((pre, template) => template(pre), util.formatWithOptions({ compact: !this._indentJson }, args[argIndex++]));
+                const transformedString = lastLayerTemplate.reduce((pre, template) => template(pre),
+                    util.formatWithOptions({ compact: !this._indentJson }, args[argIndex++]));
+                    
                 result.push(lastLayerStyle(transformedString));
             }
         }

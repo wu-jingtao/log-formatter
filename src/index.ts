@@ -1,4 +1,4 @@
-import { ILogFormatterProxy } from './ILogFormatterProxy';
+import { LogFormatterProxy } from './LogFormatterProxy';
 import { LogFormatter } from './LogFormatter';
 
 const logFormatter = new Proxy(new LogFormatter(), {
@@ -14,6 +14,6 @@ const logFormatter = new Proxy(new LogFormatter(), {
     apply(target, thisArg, argArray) {
         target.print(...argArray);
     }
-}) as ILogFormatterProxy;
+}) as LogFormatterProxy;
 
 export default logFormatter;

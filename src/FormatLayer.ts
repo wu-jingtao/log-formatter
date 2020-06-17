@@ -3,7 +3,7 @@ import { Chalk } from 'chalk';
 /**
  * 样式层
  */
-export interface IFormatLayer {
+export interface FormatLayer {
     /**
      * 当前层的样式
      */

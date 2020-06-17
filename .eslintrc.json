@@ -1,6 +1,3 @@
 {
-    "extends": "sufu",
-    "rules": {
-        "no-unused-expressions": "off"
-    }
+    "extends": ["sufu", "sufu/typescript"]
 }
