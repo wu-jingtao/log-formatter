@@ -40,7 +40,7 @@ export class LogFormatter extends Function {
     /**
      * 获取最后一个样式层并将其设置为已经使用过了
      */
-    private get _getLastFormatLayerAndSetHasUsed(): FormatLayer {  // eslint-disable-line
+    private get _getLastFormatLayerAndSetHasUsed(): FormatLayer {
         const lastLayer = this._lastFormatLayer;
         lastLayer.setting.hasUsed = true;
         return lastLayer;
