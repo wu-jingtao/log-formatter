@@ -20,10 +20,14 @@
     ],
     "author": "wujingtao",
     "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/mx601595686/log-formatter/issues"
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/wu-jingtao/log-formatter.git"
     },
-    "homepage": "https://github.com/mx601595686/log-formatter#readme",
+    "bugs": {
+        "url": "https://github.com/wu-jingtao/log-formatter/issues"
+    },
+    "homepage": "https://github.com/wu-jingtao/log-formatter#readme",
     "devDependencies": {
         "@types/expect.js": "^0.3.29",
         "@types/mocha": "^7.0.2",
