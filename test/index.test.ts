@@ -1,163 +1,88 @@
 import moment from 'moment';
-import util from 'util';
 import expect from 'expect.js';
-import chalk from 'chalk';
-
+import chalk, { Chalk } from 'chalk';
 import log from '../src';
 
 it('测试 输出到控制台', function () {
-    log.blue.line(); // 蓝色分割线
-    log.bgYellow.whiteBright.bold('用肉眼检测一下。下面输出的样式是否符合要求');
-
+    log.title('用肉眼检测一下，下面输出的样式是否符合要求');
+    log.line().blue.text.blue('蓝色分割线');
+    log.bgYellow.rgb(255, 0, 0).bold('黄色背景，红色，粗体');
     log('普通样式');
-    log.location.text.cyan.bold('log', '蓝色粗体');
-    log.log.location.text.yellow('log', '黄色未加粗');
-    log.warn.location.text.magenta.bgCyan.bold('warn', '紫色粗体背景蓝色');
-    log.error.location.text.green.underline('error', '绿色带下划线');
-    log.blue.line();
+    log.location.text.cyan.bold('方括号', '蓝青色粗体');
+    log.warn.text.magenta.bold.bgCyan('警告，洋红色，粗体，背景蓝色');
+    log.error.dateTime.text.date.reset.time.yellow('方括号黄色时间，白色日期，灰色方括号日期时间');
+    log.info.bgGreen.indentJson({ 123: 123, 456: 456 }, 'JSON 缩进');
 });
 
-describe('测试 format参数个数', function () {
+describe('测试 日期时间显示', function () {
+    it('测试 显示时间', function () {
+        expect(log.time.blue.format()).eql([chalk.gray.blue(`[${moment().format('HH:mm:ss')}]`)]);
+    });
+
+    it('测试 显示日期', function () {
+        expect(log.date.reset.format()).eql([moment().format('YYYY-MM-DD')]);
+    });
+
+    it('测试 显示日期时间', function () {
+        expect(log.dateTime.format()).eql([chalk.gray(`[${moment().format('YYYY-MM-DD HH:mm:ss')}]`)]);
+    });
+});
+
+it('测试 设置输出格式', function () {
+    expect(
+        log
+            .text.square.round.mustache.indentJson
+            .text.square.round.mustache.indentJson.reset
+            .format({ abc: 123 }, { def: 456 })
+    ).eql([`{([${JSON.stringify({ abc: 123 }, undefined, 2)}])}`, JSON.stringify({ def: 456 })]);
+});
+
+it('测试 插入符号', function () {
+    expect(log.linebreak.newline.whitespace.colon.hyphen.verticalBar.line().format(1)).eql([
+        '\r\n1\r\n    :  -  | ', `\r\n${'-'.repeat(80)}\r\n`
+    ]);
+});
+
+it('测试 占位符', function () {
+    expect(log.text.location.title.paragraph.section.format(1, 2, 3, 4, 5)).eql([
+        1, '[2]', chalk.bold('3\r\n'), '4\r\n', '\r\n5\r\n'
+    ]);
+});
+
+it('测试 chalk 功能', function () {
+    expect(
+        log
+            .level1.level2.level3.level4
+            .bold.red.bgRed
+            .rgb(0, 1, 2).bgRgb(0, 1, 2)
+            .hex('#FFF').bgHex('#FFF')
+            .ansi256(0).bgAnsi256(0)
+            .format(1)
+    ).eql([
+        new Chalk({ level: 3 })
+            .bold.red.bgRed
+            .rgb(0, 1, 2).bgRgb(0, 1, 2)
+            .hex('#FFF').bgHex('#FFF')
+            .ansi256(0).bgAnsi256(0)(1)
+    ]);
+});
+
+describe('测试 传入参数个数', function () {
     it('测试 参数个数 等于 样式层数', function () {
-        expect(log.noDatetime.text.red.text.yellow.text.blue.format(1, 2, 3)).to.be(
-            [chalk.red('1'), chalk.yellow('2'), chalk.blue('3')].join(' ')
+        expect(log.text.red.text.yellow.text.blue.format(1, 2, 3)).eql(
+            [chalk.red('1'), chalk.yellow('2'), chalk.blue('3')]
         );
     });
 
     it('测试 参数个数 大于 样式层数', function () {
-        expect(log.noDatetime.text.red.text.yellow.text.blue.format(1, 2, 3, 4)).to.be(
-            [chalk.red('1'), chalk.yellow('2'), chalk.blue('3'), chalk.blue('4')].join(' ')
+        expect(log.text.red.text.yellow.text.blue.format(1, undefined, 2, 3, null, undefined, false)).eql(
+            [chalk.red('1'), chalk.blue('2'), 3, null, false]
         );
     });
 
     it('测试 参数个数 小于 样式层数', function () {
-        expect(log.noDatetime.text.red.text.yellow.text.white.format(1, 2)).to.be(
-            [chalk.red('1'), chalk.yellow('2')].join(' ')
+        expect(log.text.red.text.yellow.text.blue.line('line', 1).reset.format(1, 2)).eql(
+            [chalk.red('1'), chalk.yellow('2'), 'line']
         );
     });
-});
-
-describe('测试 json缩进', function () {
-    const obj = { a: 1, b: 2 };
-
-    it('测试不使用缩进', function () {
-        expect(log.noDatetime.format(obj)).to.be(util.formatWithOptions({ compact: true }, obj as any));
-    });
-
-    it('测试使用缩进', function () {
-        expect(log.noDatetime.indentJson.format(obj)).to.be(util.formatWithOptions({ compact: false }, obj as any));
-    });
-});
-
-describe('测试 时间显示', function () {
-    it('测试显示日期时间', function () {
-        expect(log.blue.format('1')).to.be(
-            [chalk.gray(`[${moment().format('YYYY-MM-DD HH:mm:ss')}]`), chalk.blue('1')].join(' ')
-        );
-    });
-
-    it('测试只显示日期', function () {
-        expect(log.noTime.blue.format('2')).to.be(
-            [chalk.gray(`[${moment().format('YYYY-MM-DD')}]`), chalk.blue('2')].join(' ')
-        );
-    });
-
-    it('测试只显示时间', function () {
-        expect(log.blue.noDate.format('3')).to.be(
-            [chalk.gray(`[${moment().format('HH:mm:ss')}]`), chalk.blue('3')].join(' ')
-        );
-    });
-
-    it('测试不显示日期时间', function () {
-        expect(log.noDatetime.blue.format('4')).to.be([chalk.blue('4')].join(' '));
-
-        expect(log.noDate.noTime.blue.format('5')).to.be([chalk.blue('5')].join(' '));
-    });
-});
-
-describe('测试 样式层', function () {
-    it('测试text', function () {
-        expect(log.red.bold.format(1)).to.be(
-            [chalk.gray(`[${moment().format('YYYY-MM-DD HH:mm:ss')}]`), chalk.red.bold('1')].join(' ')
-        );
-
-        expect(log.text.red.bold.format(1)).to.be(log.red.bold.format(1));
-    });
-
-    it('测试多个样式层', function () {
-        expect(log.text.red.bold.text.blue.bgGreenBright.text.yellow.underline.format(1, 2, 3)).to.be(
-            [
-                chalk.gray(`[${moment().format('YYYY-MM-DD HH:mm:ss')}]`),
-                chalk.red.bold('1'),
-                chalk.blue.bgGreenBright('2'),
-                chalk.yellow.underline('3')
-            ].join(' ')
-        );
-
-        expect(log.red.bold.text.blue.bgGreenBright.text.yellow.underline.format(1, 2, 3)).to.be(
-            log.text.red.bold.text.blue.bgGreenBright.text.yellow.underline.format(1, 2, 3)
-        );
-    });
-
-    it('测试title', function () {
-        expect(log.title.red.bold.format(1)).to.be(log.text.red.bold.format(1));
-        expect(log.title.red.bold.title.red.bold.format(1, 2)).to.be(log.text.red.bold.text.red.bold.format(1, 2));
-    });
-
-    it('测试linefeed', function () {
-        expect(log.linefeed.red.bold.format(1)).to.be(
-            [chalk.gray(`[${moment().format('YYYY-MM-DD HH:mm:ss')}]`), '\r\n', chalk.red.bold('1')].join(' ')
-        );
-
-        expect(log.linefeed.red.bold.format(1)).to.be(log.linefeed.text.red.bold.format(1));
-    });
-
-    it('测试whitespace', function () {
-        expect(log.whitespace.red.bold.format(1)).to.be(
-            [chalk.gray(`[${moment().format('YYYY-MM-DD HH:mm:ss')}]`), ' ', chalk.red.bold('1')].join(' ')
-        );
-
-        expect(log.whitespace.red.bold.format(1)).to.be(log.whitespace.text.red.bold.format(1));
-    });
-
-    it('测试content', function () {
-        expect(log.content.red.bold.format(1)).to.be(log.linefeed.text.red.bold.format(1));
-    });
-
-    it('测试location', function () {
-        expect(log.location.red.bold.format(1)).to.be(log.text.square.red.bold.format(1));
-    });
-});
-
-it('测试 样式模板', function () {
-    expect(log.square.round.mustache.red.format(1)).to.be(
-        [chalk.gray(`[${moment().format('YYYY-MM-DD HH:mm:ss')}]`), chalk.red('{([1])}')].join(' ')
-    );
-
-    expect(log.text.square.round.mustache.red.format(1)).to.be(log.square.round.mustache.red.format(1));
-});
-
-it('测试 chalk的方法', function () {
-    const actual = log.noDatetime
-        .ansi(36).ansi256(18)
-        .rgb(1, 2, 3).hsl(1, 2, 3).hsv(1, 2, 3).hwb(1, 2, 3)
-        .hex('#DEADED')
-        .keyword('orange')
-        .bgAnsi(36).bgAnsi256(18)
-        .bgRgb(1, 2, 3).bgHsl(1, 2, 3).bgHsv(1, 2, 3).bgHwb(1, 2, 3)
-        .bgHex('#DEADED')
-        .bgKeyword('orange')
-        .format(1);
-
-    const expected = chalk
-        .ansi(36).ansi256(18)
-        .rgb(1, 2, 3).hsl(1, 2, 3).hsv(1, 2, 3).hwb(1, 2, 3)
-        .hex('#DEADED')
-        .keyword('orange')
-        .bgAnsi(36).bgAnsi256(18)
-        .bgRgb(1, 2, 3).bgHsl(1, 2, 3).bgHsv(1, 2, 3).bgHwb(1, 2, 3)
-        .bgHex('#DEADED')
-        .bgKeyword('orange')('1');
-
-    expect(actual).to.be(expected);
 });

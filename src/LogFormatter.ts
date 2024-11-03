@@ -1,373 +1,376 @@
-import moment from 'moment';
-import util from 'util';
-import chalk from 'chalk';
-
-import { FormatLayer } from './FormatLayer';
-
-export class LogFormatter extends Function {
-    // #region 私有属性与方法
+/**
+ * 输出格式化器
+ */
+export default interface LogFormatter {
+    // #region 设置输出类型
 
     /**
-     * 是否自动缩进对象输出
+     * 通过 console.log 进行输出（默认选项）
      */
-    private _indentJson = false;
-
+    readonly log: this;
     /**
-     * 使用console的何种方法打印到控制台
+     * 通过 console.error 进行输出
      */
-    private _logType: 'log' | 'error' | 'warn' = 'log';
-
+    readonly error: this;
     /**
-     * 样式层
+     * 通过 console.warn 进行输出
      */
-    private readonly _formatLayer: FormatLayer[] = [];
-
+    readonly warn: this;
     /**
-     * 添加一个未使用样式层
+     * 通过 console.info 进行输出
      */
-    private get _unusedText(): this {
-        this._formatLayer.push({ style: chalk, template: [], setting: { hasUsed: false } });
-        return this;
-    }
-
-    /**
-     * 返回最后一个样式层
-     */
-    private get _lastFormatLayer(): FormatLayer {
-        return this._formatLayer[this._formatLayer.length - 1];
-    }
-
-    /**
-     * 获取最后一个样式层并将其设置为已经使用过了
-     */
-    private get _getLastFormatLayerAndSetHasUsed(): FormatLayer {
-        const lastLayer = this._lastFormatLayer;
-        lastLayer.setting.hasUsed = true;
-        return lastLayer;
-    }
-
-    constructor() {
-        super();
-
-        // 第一层默认是时间
-        this._formatLayer.push({
-            style: chalk.gray,
-            template: [v => `[${v}]`],
-            get text() {
-                switch (this.setting.timeFormat) {
-                    case 0:
-                        return moment().format('YYYY-MM-DD HH:mm:ss');
-
-                    case 1: // noTime
-                        return moment().format('YYYY-MM-DD');
-
-                    case 2: // noDate
-                        return moment().format('HH:mm:ss');
-                }
-            },
-            setting: {
-                hasUsed: true,
-                timeFormat: 0,
-                get skip() { return this.timeFormat > 2 }
-            }
-        });
-
-        // 再添加一层是为了让用户可以在设置第一个样式之前可以不调用text
-        this._unusedText; // eslint-disable-line
-    }
-
-    /**
-     * 为最后一层设置样式，调用chalk的方法
-     */
-    private _invokeChalkFunction(name: keyof chalk.Chalk, ...args: any[]): this {
-        const lastLayer = this._getLastFormatLayerAndSetHasUsed;
-        lastLayer.style = (lastLayer.style as any)[name](...args);
-        return this;
-    }
-
-    /**
-     * 为最后一层设置样式，调用chalk的属性
-     */
-    private _invokeChalkProperty(name: keyof chalk.Chalk): this {
-        const lastLayer = this._getLastFormatLayerAndSetHasUsed;
-        lastLayer.style = (lastLayer.style as any)[name];
-        return this;
-    }
+    readonly info: this;
 
     // #endregion
 
-    // #region 格式化输出
+    // #region 设置 chalk 颜色等级
 
     /**
-     * 格式化传入的参数，但不打印到console
-     * 如果样式长度大于参数长度，则只应用对应部分，剩下的样式忽略。如果参数长度大于样式长度，则剩下的参数将应用最后一个样式
+     * 关闭所有颜色（默认根据环境自动设置）
      */
-    format(...args: any[]): string {
-        const result: string[] = [];
-        const { style: lastLayerStyle, template: lastLayerTemplate } = this._lastFormatLayer;
-
-        for (let argIndex = 0, formatIndex = 0; argIndex < args.length; formatIndex++) {
-            if (formatIndex < this._formatLayer.length) {
-                const { style, template, text, setting } = this._formatLayer[formatIndex];
-
-                if (!setting.skip) { // 判断是否跳过当前层
-                    let transformedString;
-                    if (text !== undefined)
-                        transformedString = template.reduce((pre, template) => template(pre), text);
-                    else {
-                        transformedString = template.reduce((pre, template) => template(pre),
-                            util.formatWithOptions({ compact: !this._indentJson }, args[argIndex++]));
-                    }
-
-                    result.push(style(transformedString));
-                }
-            } else {
-                const transformedString = lastLayerTemplate.reduce((pre, template) => template(pre),
-                    util.formatWithOptions({ compact: !this._indentJson }, args[argIndex++]));
-                    
-                result.push(lastLayerStyle(transformedString));
-            }
-        }
-
-        return result.join(' ');
-    }
-
+    readonly level1: this;
     /**
-     * 格式化传入的参数，并把结果打印到console
+     * 基本 16 色（默认根据环境自动设置）
      */
-    print(...args: any[]): void {
-        console[this._logType](this.format(...args));
-    }
-
+    readonly level2: this;
     /**
-     * 打印一行分隔符。如果有多个样式被指定，则只有第一个会生效。时间不会被输出
-     * @param char 分隔符字符
-     * @param length 分隔符长度。默认等于终端窗口长度
+     * ANSI 256 色（默认根据环境自动设置）
      */
-    line(char = '-', length = process.stdout.columns || 80): void {
-        const { style } = this._formatLayer[1];
-        console[this._logType](style(char.repeat(length)));
-    }
+    readonly level3: this;
+    /**
+     * 真彩色 1600 万色（默认根据环境自动设置）
+     */
+    readonly level4: this;
 
     // #endregion
 
-    // #region 输出类型设置
+    // #region 设置时间日期
 
     /**
-     * 通过console.log进行输出，这个是默认选项
+     * 在输出的最前面显示时间
      */
-    get log(): this {
-        this._logType = 'log';
-        return this;
-    }
-
+    readonly time: this;
     /**
-     * 通过console.error进行输出
+     * 在输出的最前面显示日期
      */
-    get error(): this {
-        this._logType = 'error';
-        return this;
-    }
-
+    readonly date: this;
     /**
-     * 通过console.warn进行输出
+     * 在输出的最前面显示时间和日期
      */
-    get warn(): this {
-        this._logType = 'warn';
-        return this;
-    }
-
-    /**
-     * 是否自动缩进对象输出
-     */
-    get indentJson(): this {
-        this._indentJson = true;
-        return this;
-    }
+    readonly dateTime: this;
 
     // #endregion
 
-    // #region 时间格式设置
+    // #region 设置输出格式
 
     /**
-     * 不显示时间
+     * 用方括号包裹要输出的内容
      */
-    get noTime(): this {
-        (this._formatLayer[0].setting.timeFormat as number) |= 1;
-        return this;
-    }
-
+    readonly square: this;
     /**
-     * 不显示日期
+     * 用圆括号包裹要输出的内容
      */
-    get noDate(): this {
-        (this._formatLayer[0].setting.timeFormat as number) |= 2;
-        return this;
-    }
-
+    readonly round: this;
     /**
-     * 不显示日期与时间
+     * 用花括号包裹要输出的内容
      */
-    get noDatetime(): this {
-        (this._formatLayer[0].setting.timeFormat as number) |= 3;
-        return this;
-    }
+    readonly mustache: this;
+    /**
+     * 自动缩进对象输出
+     */
+    readonly indentJson: this;
+    /**
+     * 重置当前样式
+     */
+    readonly reset: this;
 
     // #endregion
 
-    // #region 新建样式层属性
+    // #region 插入符号
 
     /**
-     * 创建一层新的样式，用于格式化下一个传入参数
+     * 向后插入换行符
      */
-    get text(): this {
-        const lastLayer = this._lastFormatLayer;
-        if (lastLayer.setting.hasUsed)
-            this._formatLayer.push({ style: chalk, template: [], setting: { hasUsed: true } });
-        else
-            lastLayer.setting.hasUsed = true; // 如果最后一层还没有用过就不在添加新的了
-
-        return this;
-    }
-
+    readonly linebreak: this;
     /**
-     * 消息的标题，text的别名
+     * 向前插入换行符
      */
-    get title(): this {
-        return this.text;
-    }
-
+    readonly newline: this;
     /**
-     * 换行
+     * 向后插入空格
      */
-    get linefeed(): this {
-        this.text._lastFormatLayer.text = '\r\n';
-        return this._unusedText;
-    }
-
+    readonly whitespace: this;
     /**
-     * 空格
+     * 向后插入冒号
      */
-    get whitespace(): this {
-        this.text._lastFormatLayer.text = ' ';
-        return this._unusedText;
-    }
-
+    readonly colon: this;
     /**
-     * 消息的正文，相当于linefeed.text
+     * 向后插入横线，连字符
      */
-    get content(): this {
-        return this.linefeed.text;
-    }
-
+    readonly hyphen: this;
     /**
-     * 代表消息发生的位置。相当于text.square
+     * 向后插入竖线
      */
-    get location(): this {
-        return this.text.square;
-    }
+    readonly verticalBar: this;
+    /**
+     * 打印一行分隔符
+     * @param char 分隔符，默认 '-'
+     * @param length 打印长度，默认 80
+     */
+    line: (char?: string, length?: number) => this;
 
     // #endregion
 
-    // #region 样式模板
+    // #region 占位符
 
     /**
-     * 用方括号包裹要输出的文本内容
+     * 占位符
      */
-    get square(): this {
-        this._getLastFormatLayerAndSetHasUsed.template.push(text => `[${text}]`);
-        return this;
-    }
-
+    readonly text: this;
     /**
-     * 用圆括号包裹要输出的文本内容
+     * 位置，等同于 text.square
      */
-    get round(): this {
-        this._getLastFormatLayerAndSetHasUsed.template.push(text => `(${text})`);
-        return this;
-    }
-
+    readonly location: this;
     /**
-     * 用花括号包裹要输出的文本内容
+     * 标题，等同于 text.bold.linebreak
      */
-    get mustache(): this {
-        this._getLastFormatLayerAndSetHasUsed.template.push(text => `{${text}}`);
-        return this;
-    }
+    readonly title: this;
+    /**
+     * 段落，等同于 text.linebreak
+     */
+    readonly paragraph: this;
+    /**
+     * 章节，等同于 text.newline.linebreak
+     */
+    readonly section: this;
 
     // #endregion
 
-    // #region chalk的方法
+    // #region 打印输出
 
-    ansi(code: number): this { return this._invokeChalkFunction('ansi', code) }
-    ansi256(index: number): this { return this._invokeChalkFunction('ansi256', index) }
-    rgb(r: number, g: number, b: number): this { return this._invokeChalkFunction('rgb', r, g, b) }
-    hsl(h: number, s: number, l: number): this { return this._invokeChalkFunction('hsl', h, s, l) }
-    hsv(h: number, s: number, v: number): this { return this._invokeChalkFunction('hsv', h, s, v) }
-    hwb(h: number, w: number, b: number): this { return this._invokeChalkFunction('hwb', h, w, b) }
-    hex(color: string): this { return this._invokeChalkFunction('hex', color) }
-    keyword(color: string): this { return this._invokeChalkFunction('keyword', color) }
-    bgAnsi(code: number): this { return this._invokeChalkFunction('ansi', code) }
-    bgAnsi256(index: number): this { return this._invokeChalkFunction('ansi256', index) }
-    bgRgb(r: number, g: number, b: number): this { return this._invokeChalkFunction('bgRgb', r, g, b) }
-    bgHsl(h: number, s: number, l: number): this { return this._invokeChalkFunction('bgHsl', h, s, l) }
-    bgHsv(h: number, s: number, v: number): this { return this._invokeChalkFunction('bgHsv', h, s, v) }
-    bgHwb(h: number, w: number, b: number): this { return this._invokeChalkFunction('bgHwb', h, w, b) }
-    bgHex(color: string): this { return this._invokeChalkFunction('bgHex', color) }
-    bgKeyword(color: string): this { return this._invokeChalkFunction('bgKeyword', color) }
+    /**
+     * 格式化传入的参数，并把结果打印到 console
+     */
+    (...data: unknown[]): void;
+    /**
+     * 格式化传入的参数，并把结果打印到 console
+     */
+    print: (...args: unknown[]) => void;
+    /**
+     * 格式化传入的参数，返回格式化后的字符串数组
+     */
+    format: (...args: unknown[]) => string[];
 
     // #endregion
 
-    // #region chalk的属性
+    // #region chalk 样式
 
-    get reset(): this { return this._invokeChalkProperty('reset') }
-    get bold(): this { return this._invokeChalkProperty('bold') }
-    get dim(): this { return this._invokeChalkProperty('dim') }
-    get italic(): this { return this._invokeChalkProperty('italic') }
-    get underline(): this { return this._invokeChalkProperty('underline') }
-    get inverse(): this { return this._invokeChalkProperty('inverse') }
-    get hidden(): this { return this._invokeChalkProperty('hidden') }
-    get strikethrough(): this { return this._invokeChalkProperty('strikethrough') }
-    get visible(): this { return this._invokeChalkProperty('visible') }
-
-    get black(): this { return this._invokeChalkProperty('black') }
-    get red(): this { return this._invokeChalkProperty('red') }
-    get green(): this { return this._invokeChalkProperty('green') }
-    get yellow(): this { return this._invokeChalkProperty('yellow') }
-    get blue(): this { return this._invokeChalkProperty('blue') }
-    get magenta(): this { return this._invokeChalkProperty('magenta') }
-    get cyan(): this { return this._invokeChalkProperty('cyan') }
-    get white(): this { return this._invokeChalkProperty('white') }
-    get gray(): this { return this._invokeChalkProperty('gray') }
-    get grey(): this { return this._invokeChalkProperty('grey') }
-
-    get blackBright(): this { return this._invokeChalkProperty('blackBright') }
-    get redBright(): this { return this._invokeChalkProperty('redBright') }
-    get greenBright(): this { return this._invokeChalkProperty('greenBright') }
-    get yellowBright(): this { return this._invokeChalkProperty('yellowBright') }
-    get blueBright(): this { return this._invokeChalkProperty('blueBright') }
-    get magentaBright(): this { return this._invokeChalkProperty('magentaBright') }
-    get cyanBright(): this { return this._invokeChalkProperty('cyanBright') }
-    get whiteBright(): this { return this._invokeChalkProperty('whiteBright') }
-
-    get bgBlack(): this { return this._invokeChalkProperty('bgBlack') }
-    get bgRed(): this { return this._invokeChalkProperty('bgRed') }
-    get bgGreen(): this { return this._invokeChalkProperty('bgGreen') }
-    get bgYellow(): this { return this._invokeChalkProperty('bgYellow') }
-    get bgBlue(): this { return this._invokeChalkProperty('bgBlue') }
-    get bgMagenta(): this { return this._invokeChalkProperty('bgMagenta') }
-    get bgCyan(): this { return this._invokeChalkProperty('bgCyan') }
-    get bgWhite(): this { return this._invokeChalkProperty('bgWhite') }
-    get bgGray(): this { return this._invokeChalkProperty('bgGray') }
-
-    get bgBlackBright(): this { return this._invokeChalkProperty('bgBlackBright') }
-    get bgRedBright(): this { return this._invokeChalkProperty('bgRedBright') }
-    get bgGreenBright(): this { return this._invokeChalkProperty('bgGreenBright') }
-    get bgYellowBright(): this { return this._invokeChalkProperty('bgYellowBright') }
-    get bgBlueBright(): this { return this._invokeChalkProperty('bgBlueBright') }
-    get bgMagentaBright(): this { return this._invokeChalkProperty('bgMagentaBright') }
-    get bgCyanBright(): this { return this._invokeChalkProperty('bgCyanBright') }
-    get bgWhiteBright(): this { return this._invokeChalkProperty('bgWhiteBright') }
+    /**
+     * 使文本加粗
+     */
+    readonly bold: this;
+    /**
+     * 降低文本的不透明度
+     */
+    readonly dim: this;
+    /**
+     * 将文本设为斜体（未得到广泛支持）
+     */
+    readonly italic: this;
+    /**
+     * 在文本下方放置一条水平线（未得到广泛支持）
+     */
+    readonly underline: this;
+    /**
+     * 在文本上方添加一条水平线（未得到广泛支持）
+     */
+    readonly overline: this;
+    /**
+     * 反转背景色和前景色
+     */
+    readonly inverse: this;
+    /**
+     * 打印文本但不可见
+     */
+    readonly hidden: this;
+    /**
+     * 在文本中心放置一条水平线（未得到广泛支持）
+     */
+    readonly strikethrough: this;
+    /**
+     * 仅当 Chalk 的颜色级别高于零时才打印文本，对于纯装饰性的东西很有用
+     */
+    readonly visible: this;
+    /**
+     * 黑色
+     */
+    readonly black: this;
+    /**
+     * 红色
+     */
+    readonly red: this;
+    /**
+     * 绿色
+     */
+    readonly green: this;
+    /**
+     * 黄色
+     */
+    readonly yellow: this;
+    /**
+     * 蓝色
+     */
+    readonly blue: this;
+    /**
+     * 洋红色
+     */
+    readonly magenta: this;
+    /**
+     * 蓝绿色
+     */
+    readonly cyan: this;
+    /**
+     * 白色
+     */
+    readonly white: this;
+    /**
+     * 灰色
+     */
+    readonly gray: this;
+    /**
+     * 灰色
+     */
+    readonly grey: this;
+    /**
+     * 黑色明亮（灰色）
+     */
+    readonly blackBright: this;
+    /**
+     * 红色明亮
+     */
+    readonly redBright: this;
+    /**
+     * 绿色明亮
+     */
+    readonly greenBright: this;
+    /**
+     * 黄色明亮
+     */
+    readonly yellowBright: this;
+    /**
+     * 蓝色明亮
+     */
+    readonly blueBright: this;
+    /**
+     * 洋红色明亮
+     */
+    readonly magentaBright: this;
+    /**
+     * 蓝绿色明亮
+     */
+    readonly cyanBright: this;
+    /**
+     * 白色明亮
+     */
+    readonly whiteBright: this;
+    /**
+     * 背景黑色
+     */
+    readonly bgBlack: this;
+    /**
+     * 背景红色
+     */
+    readonly bgRed: this;
+    /**
+     * 背景绿色
+     */
+    readonly bgGreen: this;
+    /**
+     * 背景黄色
+     */
+    readonly bgYellow: this;
+    /**
+     * 背景蓝色
+     */
+    readonly bgBlue: this;
+    /**
+     * 背景洋红色
+     */
+    readonly bgMagenta: this;
+    /**
+     * 背景蓝绿色
+     */
+    readonly bgCyan: this;
+    /**
+     * 背景白色
+     */
+    readonly bgWhite: this;
+    /**
+     * 背景灰色
+     */
+    readonly bgGray: this;
+    /**
+     * 背景黑色明亮（灰色）
+     */
+    readonly bgBlackBright: this;
+    /**
+     * 背景红色明亮
+     */
+    readonly bgRedBright: this;
+    /**
+     * 背景绿色明亮
+     */
+    readonly bgGreenBright: this;
+    /**
+     * 背景黄色明亮
+     */
+    readonly bgYellowBright: this;
+    /**
+     * 背景蓝色明亮
+     */
+    readonly bgBlueBright: this;
+    /**
+     * 背景洋红色明亮
+     */
+    readonly bgMagentaBright: this;
+    /**
+     * 背景蓝绿色明亮
+     */
+    readonly bgCyanBright: this;
+    /**
+     * 背景白色明亮
+     */
+    readonly bgWhiteBright: this;
+    /**
+     * 使用 RGB 值设置文本颜色
+     * @example log.rgb(222, 173, 237)
+     */
+    rgb: (r: number, g: number, b: number) => this;
+    /**
+     * 使用 HEX 值设置文本颜色
+     * @example log.hex('#DEADED')
+     */
+    hex: (color: string) => this;
+    /**
+     * 使用 [8-bit 无符号整数](https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit) 值设置文本颜色
+     * @example log.ansi256(201)
+     */
+    ansi256: (index: number) => this;
+    /**
+     * 使用 RGB 值设置背景颜色
+     * @example log.bgRgb(222, 173, 237)
+     */
+    bgRgb: (r: number, g: number, b: number) => this;
+    /**
+     * 使用 HEX 值设置背景颜色
+     * @example log.bgHex('#DEADED')
+     */
+    bgHex: (color: string) => this;
+    /**
+     * 使用 [8-bit 无符号整数](https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit) 值设置背景颜色
+     * @example log.bgAnsi256(201)
+     */
+    bgAnsi256: (index: number) => this;
 
     // #endregion
 }
