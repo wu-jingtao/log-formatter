@@ -5,13 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "测试调试",
             "type": "node",
             "request": "launch",
-            "name": "测试调试",
+            "internalConsoleOptions": "openOnSessionStart",
+            "skipFiles": [
+                "<node_internals>/**",                  // 跳过所有 node 内部代码
+                "${workspaceFolder}/node_modules/**",   // 跳过所有 node_modules 代码
+            ],
             "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
-            "skipFiles": ["<node_internals>/**"],
-            "args": ["--timeout", "999999", "--colors", "--require", "ts-node/register", "${workspaceRoot}/test/index.test.ts"],
-            "internalConsoleOptions": "openOnSessionStart"
+            "args": ["--timeout", "999999", "--colors", "--require", "tsx", "${workspaceRoot}/test/index.test.ts"],
         },
     ]
 }
