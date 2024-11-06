@@ -12,6 +12,9 @@ it('测试 输出到控制台', function () {
     log.warn.text.magenta.bold.bgCyan('警告，洋红色，粗体，背景蓝色');
     log.error.dateTime.text.date.reset.time.yellow('方括号黄色时间，白色日期，灰色方括号日期时间');
     log.info.bgGreen.indentJson({ 123: 123, 456: 456 }, 'JSON 缩进');
+    const style = log.cyan;
+    style('重复打印一');
+    style('重复打印二');
 });
 
 describe('测试 日期时间显示', function () {
@@ -85,4 +88,16 @@ describe('测试 传入参数个数', function () {
             [chalk.red('1'), chalk.yellow('2'), 'line']
         );
     });
+});
+
+it('测试 多次格式化', function () {
+    const style = log.text.red.text.yellow.text.blue;
+
+    expect(style.format(1, 2, 3)).eql(
+        [chalk.red('1'), chalk.yellow('2'), chalk.blue('3')]
+    );
+
+    expect(style.format(1, 2, 3)).eql(
+        [chalk.red('1'), chalk.yellow('2'), chalk.blue('3')]
+    );
 });

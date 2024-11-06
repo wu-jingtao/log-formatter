@@ -1,6 +1,6 @@
 {
     "name": "log-formatter",
-    "version": "2.0.1",
+    "version": "2.0.2",
     "description": "为 chalk 提供了一种更加方便的格式化输出方式",
     "keywords": [
         "log",
@@ -33,7 +33,7 @@
     "devDependencies": {
         "@types/expect.js": "^0.3.32",
         "@types/mocha": "^10.0.9",
-        "@types/node": "^22.8.6",
+        "@types/node": "^22.9.0",
         "eslint-config-sufu": "^3.0.2",
         "expect.js": "^0.3.1",
         "mocha": "^10.8.2",
