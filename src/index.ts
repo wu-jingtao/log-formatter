@@ -212,8 +212,7 @@ export default new Proxy(console.log, {
                     case 'print':
                     case undefined: {
                         console[logType].apply(undefined, proxy.format(...argumentsList));
-                        functionCall = undefined;
-                        return undefined;
+                        return functionCall = undefined;
                     }
                 }
             }
