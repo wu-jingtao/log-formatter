@@ -27,8 +27,8 @@
     "scripts": {
         "lint": "eslint --max-warnings 0 \"{src,test}/**/*.ts\"",
         "test": "mocha --require tsx ./test/index.test.ts",
-        "compile": "tsc",
-        "compile-watch": "tsc --watch"
+        "compile": "tsc --project tsconfig.compile.json",
+        "compile-watch": "tsc --watch --project tsconfig.compile.json"
     },
     "devDependencies": {
         "@types/expect.js": "^0.3.32",
