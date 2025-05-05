@@ -83,9 +83,9 @@ export default new Proxy(console.log, {
                     case 'level4': { currentLayer.chalk.level = 3; break }
 
                     // 设置输出格式
-                    case 'square': { currentLayer.processor.push(text => `[${text}]`); break }
-                    case 'round': { currentLayer.processor.push(text => `(${text})`); break }
-                    case 'mustache': { currentLayer.processor.push(text => `{${text}}`); break }
+                    case 'square': { currentLayer.processor.push((text) => `[${text}]`); break }
+                    case 'round': { currentLayer.processor.push((text) => `(${text})`); break }
+                    case 'mustache': { currentLayer.processor.push((text) => `{${text}}`); break }
                     case 'indentJson': { currentLayer.indentJson = true; break }
                     case 'reset': {
                         currentLayer.chalk = new Chalk();
@@ -95,12 +95,12 @@ export default new Proxy(console.log, {
                     }
 
                     // 插入符号
-                    case 'linebreak': { currentLayer.processor.push(text => text + '\r\n'); break }
-                    case 'newline': { currentLayer.processor.push(text => '\r\n' + text); break }
-                    case 'whitespace': { currentLayer.processor.push(text => text + '   '); break }
-                    case 'colon': { currentLayer.processor.push(text => text + ' : '); break }
-                    case 'hyphen': { currentLayer.processor.push(text => text + ' - '); break }
-                    case 'verticalBar': { currentLayer.processor.push(text => text + ' | '); break }
+                    case 'linebreak': { currentLayer.processor.push((text) => text + '\r\n'); break }
+                    case 'newline': { currentLayer.processor.push((text) => '\r\n' + text); break }
+                    case 'whitespace': { currentLayer.processor.push((text) => text + '   '); break }
+                    case 'colon': { currentLayer.processor.push((text) => text + ' : '); break }
+                    case 'hyphen': { currentLayer.processor.push((text) => text + ' - '); break }
+                    case 'verticalBar': { currentLayer.processor.push((text) => text + ' | '); break }
 
                     // chalk 样式
                     case 'bold':
