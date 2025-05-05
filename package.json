@@ -26,7 +26,7 @@
     ],
     "scripts": {
         "lint": "eslint --max-warnings 0 \"{src,test}/**/*.ts\"",
-        "test": "mocha --require ts-node/register ./test/index.test.ts",
+        "test": "mocha --require tsx ./test/index.test.ts",
         "compile": "tsc --project tsconfig.compile.json",
         "compile-watch": "tsc --watch --project tsconfig.compile.json"
     },
@@ -37,7 +37,7 @@
         "eslint-config-sufu": "^3.0.3",
         "expect.js": "^0.3.1",
         "mocha": "^10.8.2",
-        "ts-node": "^10.9.2",
+        "tsx": "^4.19.4",
         "typescript": "^5.6.3"
     },
     "dependencies": {
