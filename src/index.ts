@@ -28,7 +28,7 @@ export default new Proxy(console.log, {
     get(target, property: keyof LogFormatter, receiver) {
         const layers: FormatLayer[] = [];
         let currentLayer: FormatLayer | undefined;
-        let functionCall: 'line' | 'print' | 'format' | 'rgb' | 'hex' | 'ansi256' | 'bgRgb' | 'bgHex' | 'bgAnsi256' | undefined;
+        let functionCall: 'line' | 'print' | 'format' | 'formatString' | 'rgb' | 'hex' | 'ansi256' | 'bgRgb' | 'bgHex' | 'bgAnsi256' | undefined;
         let logType: 'log' | 'error' | 'warn' | 'info' = 'log';
 
         function createLayer(prepend?: boolean): FormatLayer {
@@ -39,38 +39,51 @@ export default new Proxy(console.log, {
 
         const proxy: LogFormatter = new Proxy<any>(function LogFormatter() { /* Proxy 被代理对象 */ }, {
             get(target, property: keyof LogFormatter, receiver) {
+                // 工具函数
+                if (property === 'bind') {
+                    return (...args1: unknown[]) => {
+                        return (...args2: unknown[]) => {
+                            // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+                            return proxy(...args1, ...args2);
+                        };
+                    };
+                }
+
                 // 清除上一次方法调用名称
                 functionCall = undefined;
 
-                // 设置输出类型
-                if (property === 'log') { logType = 'log'; return proxy }
-                if (property === 'error') { logType = 'error'; return proxy }
-                if (property === 'warn') { logType = 'warn'; return proxy }
-                if (property === 'info') { logType = 'info'; return proxy }
+                // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
+                switch (property) {
+                    // 设置输出类型
+                    case 'log': { logType = 'log'; return proxy }
+                    case 'error': { logType = 'error'; return proxy }
+                    case 'warn': { logType = 'warn'; return proxy }
+                    case 'info': { logType = 'info'; return proxy }
 
-                // 设置时间日期
-                if (property === 'time') {
-                    createLayer(true).internalProcessor = () => moment().format('HH:mm:ss');
-                    return proxy.square.gray;
-                }
-                if (property === 'date') {
-                    createLayer(true).internalProcessor = () => moment().format('YYYY-MM-DD');
-                    return proxy.square.gray;
-                }
-                if (property === 'dateTime') {
-                    createLayer(true).internalProcessor = () => moment().format('YYYY-MM-DD HH:mm:ss');
-                    return proxy.square.gray;
-                }
+                    // 设置时间日期
+                    case 'time': {
+                        createLayer(true).internalProcessor = () => moment().format('HH:mm:ss');
+                        return proxy.square.gray;
+                    }
+                    case 'date': {
+                        createLayer(true).internalProcessor = () => moment().format('YYYY-MM-DD');
+                        return proxy.square.gray;
+                    }
+                    case 'dateTime': {
+                        createLayer(true).internalProcessor = () => moment().format('YYYY-MM-DD HH:mm:ss');
+                        return proxy.square.gray;
+                    }
 
-                // 占位符
-                if (property === 'text') { createLayer(); return proxy }
-                if (property === 'title') { return proxy.text.bold.linebreak }
-                if (property === 'location') { return proxy.text.square }
-                if (property === 'paragraph') { return proxy.text.linebreak }
-                if (property === 'section') { return proxy.text.newline.linebreak }
+                    // 占位符
+                    case 'text': { createLayer(); return proxy }
+                    case 'title': { return proxy.text.bold.linebreak }
+                    case 'location': { return proxy.text.square }
+                    case 'paragraph': { return proxy.text.linebreak }
+                    case 'section': { return proxy.text.newline.linebreak }
 
-                // 打印一行分隔符
-                if (property === 'line') { functionCall = property; return proxy }
+                    // 打印一行分隔符
+                    case 'line': { functionCall = property; return proxy }
+                }
 
                 // 检查是否已经创建 layer（注意有些属性不能放在这行代码之后，避免重复创建空层）
                 currentLayer ??= createLayer();
@@ -154,6 +167,7 @@ export default new Proxy(console.log, {
                     // 方法调用
                     case 'print':
                     case 'format':
+                    case 'formatString':
                     case 'rgb':
                     case 'hex':
                     case 'ansi256':
@@ -208,6 +222,9 @@ export default new Proxy(console.log, {
                             result.push(content);
                         }
                         return result;
+                    }
+                    case 'formatString': {
+                        return proxy.format(...argumentsList).join('');
                     }
                     case 'print':
                     case undefined: {

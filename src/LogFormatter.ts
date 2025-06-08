@@ -160,6 +160,10 @@ export default interface LogFormatter {
      * 格式化传入的参数，返回格式化后的字符串数组
      */
     format: (...args: unknown[]) => string[];
+    /**
+     * 格式化传入的参数，返回格式化后的字符串
+     */
+    formatString: (...args: unknown[]) => string;
 
     // #endregion
 
@@ -371,6 +375,16 @@ export default interface LogFormatter {
      * @example log.bgAnsi256(201)
      */
     bgAnsi256: (index: number) => this;
+
+    // #endregion
+
+    // #region 工具函数
+
+    /**
+     * 参数绑定
+     * @param args 参数列表
+     */
+    bind: (...args: unknown[]) => (...args: unknown[]) => unknown;
 
     // #endregion
 }
