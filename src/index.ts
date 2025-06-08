@@ -110,10 +110,10 @@ export default new Proxy(console.log, {
                     // 插入符号
                     case 'linebreak': { currentLayer.processor.push((text) => text + '\r\n'); break }
                     case 'newline': { currentLayer.processor.push((text) => '\r\n' + text); break }
-                    case 'whitespace': { currentLayer.processor.push((text) => text + '   '); break }
-                    case 'colon': { currentLayer.processor.push((text) => text + ' : '); break }
-                    case 'hyphen': { currentLayer.processor.push((text) => text + ' - '); break }
-                    case 'verticalBar': { currentLayer.processor.push((text) => text + ' | '); break }
+                    case 'whitespace': { currentLayer.processor.push((text) => text + ' '); break }
+                    case 'colon': { currentLayer.processor.push((text) => text + ':'); break }
+                    case 'hyphen': { currentLayer.processor.push((text) => text + '-'); break }
+                    case 'verticalBar': { currentLayer.processor.push((text) => text + '|'); break }
 
                     // chalk 样式
                     case 'bold':

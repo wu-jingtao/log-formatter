@@ -56,7 +56,7 @@ describe('测试 设置输出格式', function () {
 
 it('测试 插入符号', function () {
     expect(log.linebreak.newline.whitespace.colon.hyphen.verticalBar.line().format(1)).eql([
-        '\r\n1\r\n    :  -  | ', `\r\n${'-'.repeat(80)}\r\n`
+        '\r\n1\r\n :-|', `\r\n${'-'.repeat(80)}\r\n`
     ]);
 });
 
