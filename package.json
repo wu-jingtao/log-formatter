@@ -1,6 +1,6 @@
 {
     "name": "log-formatter",
-    "version": "2.0.5",
+    "version": "2.0.6",
     "description": "为 chalk 提供了一种更加方便的格式化输出方式",
     "keywords": [
         "log",

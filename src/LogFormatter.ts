@@ -382,9 +382,10 @@ export default interface LogFormatter {
 
     /**
      * 参数绑定
+     * @param _this this 参数，不需要传递
      * @param args 参数列表
      */
-    bind: (...args: unknown[]) => (...args: unknown[]) => unknown;
+    bind: (_this: undefined, ...args: unknown[]) => (...args: unknown[]) => unknown;
 
     // #endregion
 }

@@ -41,7 +41,7 @@ export default new Proxy(console.log, {
             get(target, property: keyof LogFormatter, receiver) {
                 // 工具函数
                 if (property === 'bind') {
-                    return (...args1: unknown[]) => {
+                    return (_this: undefined, ...args1: unknown[]) => {
                         return (...args2: unknown[]) => {
                             // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
                             return proxy(...args1, ...args2);

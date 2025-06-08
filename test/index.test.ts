@@ -187,7 +187,7 @@ it('测试 formatString', function () {
 });
 
 it('测试 bind', function () {
-    expect(log.text.red.text.yellow.text.blue.format.bind(1, 2)(3)).eql(
+    expect(log.text.red.text.yellow.text.blue.format.bind(undefined, 1, 2)(3)).eql(
         [chalk.red('1'), chalk.yellow('2'), chalk.blue('3')]
     );
 });
