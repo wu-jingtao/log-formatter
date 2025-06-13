@@ -210,8 +210,19 @@ export default new Proxy(console.log, {
                         while (layerIndex < layers.length) {
                             const layer = layers[layerIndex++]!;
                             let content = layer.internalProcessor ? layer.internalProcessor() : argumentsList[argIndex++];
-                            if (content === undefined) { continue } // 如果没有内容就跳过当前层
-                            if (typeof content === 'object') { content = JSON.stringify(content, undefined, layer.indentJson ? 2 : undefined) }
+
+                            if (content === undefined) {
+                                content = 'undefined';
+                            } else if (content === null) {
+                                content = 'null';
+                            } else if (content instanceof Error) {
+                                // 不能对 Error 进行任何处理，否则控制台的打印会出问题
+                                result.push(content);
+                                continue;
+                            } else if (typeof content === 'object') {
+                                content = JSON.stringify(content, undefined, layer.indentJson ? 2 : undefined);
+                            }
+
                             content = layer.processor.reduce((previous, current) => current(previous), content);
                             result.push(layer.chalk(content));
                         }

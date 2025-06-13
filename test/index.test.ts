@@ -12,6 +12,7 @@ it('测试 输出到控制台', function () {
     log.warn.text.magenta.bold.bgCyan('警告，洋红色，粗体，背景蓝色');
     log.error.dateTime.text.date.reset.time.yellow('方括号黄色时间，白色日期，灰色方括号日期时间');
     log.info.bgGreen.indentJson({ 123: 123, 456: 456 }, 'JSON 缩进');
+    log.error.location.section.red('打印 Error', new Error('错误内容'));
     const style = log.cyan;
     style('重复打印一');
     style('重复打印二');
@@ -42,15 +43,24 @@ describe('测试 设置输出格式', function () {
     });
 
     it('测试 空对象', function () {
-        expect(log.text.format({})).eql(['{}']);
+        expect(log.text.red.format({})).eql([chalk.red('{}')]);
     });
 
     it('测试 undefined', function () {
-        expect(log.text.format(undefined)).eql([]);
+        expect(log.text.red.format(undefined)).eql([chalk.red('undefined')]);
+    });
+
+    it('测试 null', function () {
+        expect(log.text.red.format(null)).eql([chalk.red('null')]);
+    });
+
+    it('测试 Error', function () {
+        const error = new Error();
+        expect(log.text.red.format(error)).eql([error]);
     });
 
     it('测试 reset 恢复样式', function () {
-        expect(log.red.reset.format('a')).eql(['a']);
+        expect(log.red.reset.format(1, 2)).eql([1, 2]);
     });
 });
 
@@ -154,19 +164,19 @@ describe('测试 传入参数个数', function () {
     });
 
     it('测试 参数个数 大于 样式层数', function () {
-        expect(log.text.red.text.yellow.text.blue.format(1, undefined, 2, 3, null, undefined, false)).eql(
-            [chalk.red('1'), chalk.blue('2'), 3, null, false]
+        expect(log.text.red.text.yellow.text.blue.format(1, 2, 3, 4, 5, 6, 7)).eql(
+            [chalk.red('1'), chalk.yellow('2'), chalk.blue(3), 4, 5, 6, 7]
         );
     });
 
     it('测试 参数个数 小于 样式层数', function () {
         expect(log.text.red.text.yellow.text.blue.line('line', 1).reset.format(1, 2)).eql(
-            [chalk.red('1'), chalk.yellow('2'), 'line']
+            [chalk.red('1'), chalk.yellow('2'), chalk.blue('undefined'), 'line']
         );
     });
 
     it('测试 无参数', function () {
-        expect(log.text.red.format()).eql([]);
+        expect(log.text.red.format()).eql([chalk.red('undefined')]);
     });
 });
 
