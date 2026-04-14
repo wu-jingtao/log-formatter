@@ -198,17 +198,20 @@ export default new Proxy(console.log, {
                         return proxy;
                     }
                     case 'line': {
-                        const [char = '-', length = 80] = argumentsList as [string, number];
+                        const [char = '-', length = 80] = argumentsList as [string | undefined, number | undefined];
                         const text = char.repeat(length);
                         createLayer().internalProcessor = () => text;
                         return proxy.newline.linebreak;
                     }
                     case 'format': {
                         const result: unknown[] = [];
-                        let layerIndex = 0, argIndex = 0;
 
-                        while (layerIndex < layers.length) {
-                            const layer = layers[layerIndex++]!;
+                        for (
+                            let layerIndex = 0, argIndex = 0;
+                            layerIndex < layers.length || argIndex < argumentsList.length;
+                            layerIndex++
+                        ) {
+                            const layer = layerIndex >= layers.length ? layers.at(-1)! : layers[layerIndex]!;
                             let content = layer.internalProcessor ? layer.internalProcessor() : argumentsList[argIndex++];
 
                             if (content === undefined) {
@@ -227,15 +230,10 @@ export default new Proxy(console.log, {
                             result.push(layer.chalk(content));
                         }
 
-                        while (argIndex < argumentsList.length) {
-                            const content = argumentsList[argIndex++];
-                            if (content === undefined) { continue }
-                            result.push(content);
-                        }
                         return result;
                     }
                     case 'formatString': {
-                        return proxy.format(...argumentsList).join('');
+                        return proxy.format(...argumentsList).join(' ');
                     }
                     case 'print':
                     case undefined: {

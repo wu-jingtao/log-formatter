@@ -12,7 +12,7 @@ it('测试 输出到控制台', function () {
     log.warn.text.magenta.bold.bgCyan('警告，洋红色，粗体，背景蓝色');
     log.error.dateTime.text.date.reset.time.yellow('方括号黄色时间，白色日期，灰色方括号日期时间');
     log.info.bgGreen.indentJson({ 123: 123, 456: 456 }, 'JSON 缩进');
-    log.error.location.section.red('打印 Error', new Error('错误内容'));
+    log.error.location.linebreak.red.text('打印 Error', new Error('错误内容'));
     const style = log.cyan;
     style('重复打印一');
     style('重复打印二');
@@ -164,8 +164,14 @@ describe('测试 传入参数个数', function () {
     });
 
     it('测试 参数个数 大于 样式层数', function () {
-        expect(log.text.red.text.yellow.text.blue.format(1, 2, 3, 4, 5, 6, 7)).eql(
-            [chalk.red('1'), chalk.yellow('2'), chalk.blue(3), 4, 5, 6, 7]
+        expect(log.text.red.text.yellow.text.blue.format(1, 2, 3, 4, 5)).eql(
+            [
+                chalk.red(1),
+                chalk.yellow(2),
+                chalk.blue(3),
+                chalk.blue(4),
+                chalk.blue(5),
+            ]
         );
     });
 
@@ -192,7 +198,7 @@ it('测试 多次格式化', function () {
 
 it('测试 formatString', function () {
     expect(log.text.red.text.yellow.text.blue.formatString(1, 2, 3)).eql(
-        [chalk.red('1'), chalk.yellow('2'), chalk.blue('3')].join('')
+        [chalk.red('1'), chalk.yellow('2'), chalk.blue('3')].join(' ')
     );
 });
 
