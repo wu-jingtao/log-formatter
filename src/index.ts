@@ -1,4 +1,3 @@
-import moment from 'moment';
 import { Chalk, type ChalkInstance } from 'chalk';
 import type LogFormatter from './LogFormatter';
 
@@ -62,15 +61,15 @@ export default new Proxy(console.log, {
 
                     // 设置时间日期
                     case 'time': {
-                        createLayer(true).internalProcessor = () => moment().format('HH:mm:ss');
+                        createLayer(true).internalProcessor = () => Temporal.Now.plainTimeISO().toString().slice(0, 8); // 'HH:mm:ss'
                         return proxy.square.gray;
                     }
                     case 'date': {
-                        createLayer(true).internalProcessor = () => moment().format('YYYY-MM-DD');
+                        createLayer(true).internalProcessor = () => Temporal.Now.plainDateISO().toString(); // 'YYYY-MM-DD'
                         return proxy.square.gray;
                     }
                     case 'dateTime': {
-                        createLayer(true).internalProcessor = () => moment().format('YYYY-MM-DD HH:mm:ss');
+                        createLayer(true).internalProcessor = () => Temporal.Now.plainDateTimeISO().toString({ smallestUnit: 'second' }).replace('T', ' '); // 'YYYY-MM-DD HH:mm:ss'
                         return proxy.square.gray;
                     }
 
