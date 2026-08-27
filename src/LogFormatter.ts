@@ -9,36 +9,44 @@ export default interface LogFormatter {
      */
     readonly log: this;
     /**
-     * 通过 console.error 进行输出
+     * 通过 console.info 进行输出
      */
-    readonly error: this;
+    readonly info: this;
     /**
      * 通过 console.warn 进行输出
      */
     readonly warn: this;
     /**
-     * 通过 console.info 进行输出
+     * 通过 console.error 进行输出
      */
-    readonly info: this;
+    readonly error: this;
+    /**
+     * 通过 console.debug 进行输出
+     */
+    readonly debug: this;
 
     // #endregion
 
     // #region 设置 chalk 颜色等级
 
     /**
-     * 关闭所有颜色（默认根据环境自动设置）
+     * 关闭所有颜色
+     * @description Chalk 会根据环境自动设置
      */
     readonly level1: this;
     /**
-     * 基本 16 色（默认根据环境自动设置）
+     * 基本 16 色
+     * @description Chalk 会根据环境自动设置
      */
     readonly level2: this;
     /**
-     * ANSI 256 色（默认根据环境自动设置）
+     * ANSI 256 色
+     * @description Chalk 会根据环境自动设置
      */
     readonly level3: this;
     /**
-     * 真彩色 1600 万色（默认根据环境自动设置）
+     * 真彩色 1600 万色
+     * @description Chalk 会根据环境自动设置
      */
     readonly level4: this;
 
@@ -80,7 +88,7 @@ export default interface LogFormatter {
      */
     readonly indentJson: this;
     /**
-     * 重置当前样式
+     * 重置当前层样式
      */
     readonly reset: this;
 

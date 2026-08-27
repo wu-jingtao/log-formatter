@@ -143,16 +143,22 @@ describe('测试 chalk 样式功能', function () {
 
 describe('测试 颜色等级', function () {
     it('测试 level1', function () {
-        expect(log.level1.red.format('a')).eql([new Chalk({ level: 0 }).red('a')]);
+        expect(log.level1.text.red.text.blue.format('a', 'b')).eql(['a', 'b']);
     });
+
     it('测试 level2', function () {
-        expect(log.level2.red.format('a')).eql([new Chalk({ level: 1 }).red('a')]);
+        expect(log.text.level2.red.text.blue.format('a', 'b'))
+            .eql([new Chalk({ level: 1 }).red('a'), new Chalk({ level: 1 }).blue('b')]);
     });
+
     it('测试 level3', function () {
-        expect(log.level3.red.format('a')).eql([new Chalk({ level: 2 }).red('a')]);
+        expect(log.text.red.level3.text.blue.format('a', 'b'))
+            .eql([new Chalk({ level: 2 }).red('a'), new Chalk({ level: 2 }).blue('b')]);
     });
+
     it('测试 level4', function () {
-        expect(log.level4.red.format('a')).eql([new Chalk({ level: 3 }).red('a')]);
+        expect(log.text.red.text.blue.level4.format('a', 'b'))
+            .eql([new Chalk({ level: 3 }).red('a'), new Chalk({ level: 3 }).blue('b')]);
     });
 });
 

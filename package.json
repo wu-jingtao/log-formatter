@@ -1,6 +1,6 @@
 {
     "name": "log-formatter",
-    "version": "2.1.2",
+    "version": "2.1.3",
     "description": "为 chalk 提供了一种更加方便的格式化输出方式",
     "keywords": [
         "log",
@@ -26,6 +26,7 @@
     ],
     "scripts": {
         "lint": "eslint --max-warnings 0 \"{src,test}/**/*.ts\"",
+        "lint-fix": "eslint --fix --max-warnings 0 \"{src,test}/**/*.ts\"",
         "test": "mocha --require tsx ./test/index.test.ts",
         "compile": "tsc --project tsconfig.compile.json",
         "compile-watch": "tsc --watch --project tsconfig.compile.json"

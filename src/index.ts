@@ -1,38 +1,21 @@
-import { Chalk, type ChalkInstance } from 'chalk';
+import { Chalk, type ChalkInstance, type ColorSupportLevel } from 'chalk';
 import { getDate, getDateTime, getTime } from './datetime';
 import type LogFormatter from './LogFormatter';
-
-/**
- * 格式化层
- */
-interface FormatLayer {
-    /**
-     * 着色器
-     */
-    chalk: ChalkInstance;
-    /**
-     * 文本加工函数列表
-     */
-    processor: ((text: string) => string)[];
-    /**
-     * 内部，文本生成器
-     */
-    internalProcessor?: () => string;
-    /**
-     * 是否缩进对象输出
-     */
-    indentJson?: boolean;
-}
 
 export default new Proxy(console.log, {
     get(target, property: keyof LogFormatter, receiver) {
         const layers: FormatLayer[] = [];
         let currentLayer: FormatLayer | undefined;
         let functionCall: 'line' | 'print' | 'format' | 'formatString' | 'rgb' | 'hex' | 'ansi256' | 'bgRgb' | 'bgHex' | 'bgAnsi256' | undefined;
-        let logType: 'log' | 'error' | 'warn' | 'info' = 'log';
+        let logType: 'log' | 'info' | 'warn' | 'error' | 'debug' = 'log';
+        let colorLevel: ColorSupportLevel | undefined;
 
         function createLayer(prepend?: boolean): FormatLayer {
-            currentLayer = { chalk: new Chalk(), processor: [] };
+            currentLayer = {
+                chalk: new Chalk(colorLevel !== undefined ? { level: colorLevel } : undefined),
+                processor: []
+            };
+
             prepend ? layers.unshift(currentLayer) : layers.push(currentLayer);
             return currentLayer;
         }
@@ -59,6 +42,29 @@ export default new Proxy(console.log, {
                     case 'error': { logType = 'error'; return proxy }
                     case 'warn': { logType = 'warn'; return proxy }
                     case 'info': { logType = 'info'; return proxy }
+                    case 'debug': { logType = 'debug'; return proxy }
+
+                    // 设置 chalk 颜色等级
+                    case 'level1': {
+                        layers.forEach((layer) => layer.chalk.level = 0);
+                        colorLevel = 0;
+                        return proxy;
+                    }
+                    case 'level2': {
+                        layers.forEach((layer) => layer.chalk.level = 1);
+                        colorLevel = 1;
+                        return proxy;
+                    }
+                    case 'level3': {
+                        layers.forEach((layer) => layer.chalk.level = 2);
+                        colorLevel = 2;
+                        return proxy;
+                    }
+                    case 'level4': {
+                        layers.forEach((layer) => layer.chalk.level = 3);
+                        colorLevel = 3;
+                        return proxy;
+                    }
 
                     // 设置时间日期
                     case 'time': {
@@ -76,8 +82,8 @@ export default new Proxy(console.log, {
 
                     // 占位符
                     case 'text': { createLayer(); return proxy }
-                    case 'title': { return proxy.text.bold.linebreak }
                     case 'location': { return proxy.text.square }
+                    case 'title': { return proxy.text.bold.linebreak }
                     case 'paragraph': { return proxy.text.linebreak }
                     case 'section': { return proxy.text.newline.linebreak }
 
@@ -89,19 +95,13 @@ export default new Proxy(console.log, {
                 currentLayer ??= createLayer();
 
                 switch (property) {
-                    // 设置 chalk 颜色等级
-                    case 'level1': { currentLayer.chalk.level = 0; break }
-                    case 'level2': { currentLayer.chalk.level = 1; break }
-                    case 'level3': { currentLayer.chalk.level = 2; break }
-                    case 'level4': { currentLayer.chalk.level = 3; break }
-
                     // 设置输出格式
                     case 'square': { currentLayer.processor.push((text) => `[${text}]`); break }
                     case 'round': { currentLayer.processor.push((text) => `(${text})`); break }
                     case 'mustache': { currentLayer.processor.push((text) => `{${text}}`); break }
                     case 'indentJson': { currentLayer.indentJson = true; break }
                     case 'reset': {
-                        currentLayer.chalk = new Chalk();
+                        currentLayer.chalk = new Chalk(colorLevel !== undefined ? { level: colorLevel } : undefined);
                         currentLayer.processor = [];
                         currentLayer.indentJson = false;
                         break;
@@ -237,7 +237,7 @@ export default new Proxy(console.log, {
                     }
                     case 'print':
                     case undefined: {
-                        console[logType].apply(undefined, proxy.format(...argumentsList));
+                        console[logType](...proxy.format(...argumentsList));
                         return functionCall = undefined;
                     }
                 }
@@ -247,3 +247,25 @@ export default new Proxy(console.log, {
         return proxy[property];
     }
 }) as LogFormatter;
+
+/**
+ * 格式化层
+ */
+interface FormatLayer {
+    /**
+     * 着色器
+     */
+    chalk: ChalkInstance;
+    /**
+     * 文本加工函数列表
+     */
+    processor: ((text: string) => string)[];
+    /**
+     * 内部，文本生成器
+     */
+    internalProcessor?: () => string;
+    /**
+     * 是否缩进对象输出
+     */
+    indentJson?: boolean;
+}
