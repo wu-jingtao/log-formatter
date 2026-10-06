@@ -2,13 +2,15 @@ import { Chalk, type ChalkInstance, type ColorSupportLevel } from 'chalk';
 import { getDate, getDateTime, getTime } from './datetime';
 import type LogFormatter from './LogFormatter';
 
+const isBrowser = typeof window !== 'undefined';
+
 export default new Proxy(console.log, {
     get(target, property: keyof LogFormatter, receiver) {
         const layers: FormatLayer[] = [];
         let currentLayer: FormatLayer | undefined;
         let functionCall: 'line' | 'print' | 'format' | 'formatString' | 'rgb' | 'hex' | 'ansi256' | 'bgRgb' | 'bgHex' | 'bgAnsi256' | undefined;
         let logType: 'log' | 'info' | 'warn' | 'error' | 'debug' = 'log';
-        let colorLevel: ColorSupportLevel | undefined;
+        let colorLevel: ColorSupportLevel | undefined = isBrowser ? 0 : undefined;
 
         function createLayer(prepend?: boolean): FormatLayer {
             currentLayer = {
